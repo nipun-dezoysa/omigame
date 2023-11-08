@@ -3,6 +3,8 @@ const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+var db = require("./database.js");
+var randomstring = require("randomstring");
 
 app.use(cors());
 const server = http.createServer(app);
@@ -18,21 +20,15 @@ var games = {
 io.on("connection", (socket) => {
   console.log("user: " + socket.id);
   socket.on("create_room", (data) => {
-    var found = false;
-    for (var a = 0; a < name.length; a++) {
-      if (name[a].id == data.roomId) found = true;
-    }
-    if (found) {
-      socket.emit("receive_message", "already have");
-    } else {
-      name.push({
-        id: data.roomId,
-        player1: {name:data.name, socket: socket.id, cards: null },
-        player2: null,
-      });
-      socket.join(data.roomId);
-      socket.emit("receive_message", "ok");
-    }
+    var roomid = randomstring.generate(5);
+    db.run(
+      "INSERT INTO rooms(roomid,password) VALUES (?,?)",
+      [roomid, "aa"],
+      (err) => {
+        if (err) console.log(err);
+        else console.log("inserted");
+      }
+    );
   });
   socket.on("join_room", (data) => {
     var found = false;
@@ -51,9 +47,16 @@ io.on("connection", (socket) => {
   socket.on("disconnecting", () => {
     console.log(socket.id); // the Set contains at least the socket ID
   });
-  socket.on("disconnect", () => {
-    console.log("ado " + socket.id);
-  });
+});
+
+var sql = "select * from rooms";
+
+db.get(sql, (err, row) => {
+  if (err) {
+    res.status(400).json({ error: err.message });
+    return;
+  }
+  console.log(row);
 });
 
 server.listen(3001, () => {
