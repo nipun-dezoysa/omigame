@@ -11,24 +11,29 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
 });
-var name = [];
-var games = {
-  id: "as",
-  player1: { cards: [1, 2, 3, 4, 5] },
-  player2: null,
-};
+
 io.on("connection", (socket) => {
   console.log("user: " + socket.id);
   socket.on("create_room", (data) => {
     var roomid = randomstring.generate(5);
-    db.run(
-      "INSERT INTO rooms(roomid,password) VALUES (?,?)",
-      [roomid, "aa"],
-      (err) => {
-        if (err) console.log(err);
-        else console.log("inserted");
+    db.run("INSERT INTO game(roomid) VALUES (?)", [roomid], (err) => {
+      if (err) console.log(err);
+      else {
+        socket.join(roomid);
+        var clients = io.sockets.clients
+        console.log(clients);
+        db.get("SELECT * from game ORDER BY gameid DESC",[],(eror,row)=>{
+          console.log(row);
+          var sql= "INSERT INTO player (playerno,gameid,name,socket) VALUES (?,?,?,?)";
+          db.run(sql,[1,row.gameid,data.name,socket.id]);
+          db.run(sql, [2,row.gameid, "", ""]);
+          db.run(sql, [3,row.gameid, "", ""]);
+          db.run(sql, [4,row.gameid, "", ""]);
+          socket.emit("gameid",row.gameid);
+        });
+        
       }
-    );
+    });
   });
   socket.on("join_room", (data) => {
     var found = false;
@@ -49,15 +54,7 @@ io.on("connection", (socket) => {
   });
 });
 
-var sql = "select * from rooms";
 
-db.get(sql, (err, row) => {
-  if (err) {
-    res.status(400).json({ error: err.message });
-    return;
-  }
-  console.log(row);
-});
 
 server.listen(3001, () => {
   console.log("server working");

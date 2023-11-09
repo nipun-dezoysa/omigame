@@ -1,5 +1,4 @@
 var sqlite3 = require("sqlite3").verbose();
-
 const DBSOURCE = "db.sqlite";
 
 let db = new sqlite3.Database(DBSOURCE, (err) => {
@@ -9,33 +8,33 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     throw err;
   } else {
     console.log("Connected to the SQLite database.");
-    
     db.run(
-      `CREATE TABLE rooms (
-            roomid text PRIMARY KEY,
-            password text
-            );`,
+      `CREATE TABLE game (
+            gameid INTEGER PRIMARY KEY AUTOINCREMENT,
+            roomid text
+            )`,
       (err) => {
         if (err) {
           // Table already created
-        } else {
-          // Table just created, creating some rows
+          // console.log(err);
+          
         }
       }
     );
-    // db.run(
-    //   `CREATE TABLE rooms (
-    //         roomid text PRIMARY KEY,
-    //         password text
-    //         )`,
-    //   (err) => {
-    //     if (err) {
-    //       // Table already created
-    //     } else {
-    //       // Table just created, creating some rows
-    //     }
-    //   }
-    // );
+    db.run(
+      `CREATE TABLE player (
+            playerid INTEGER PRIMARY KEY AUTOINCREMENT,
+            playerno INTEGER,
+            gameid text,
+            name text,
+            socket text
+            )`,
+      (err) => {
+        if (err) {
+        //  console.log(err);
+        } 
+      }
+    );
   }
 });
 
