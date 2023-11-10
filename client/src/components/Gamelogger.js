@@ -1,16 +1,41 @@
 import Inputfield from "./Inputfield";
 import Button from "./Button";
 import Playerslot from "./Playerslot";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { BiArrowBack } from "react-icons/bi";
+import { GameContext } from "../GameContextProvider";
 export default function Gamelogger() {
+  const {
+    name,
+    setName,
+    id,
+    setId,
+    roomid,
+    create,
+    join,
+    slot1,
+    slot2,
+    slot3,
+    slot4,
+    setSlot1,
+    setSlot2,
+    setSlot3,
+    setSlot4,
+    admin,
+    gameStart
+  } = useContext(GameContext);
   const [iscreate, setIscreate] = useState(true);
-  const [name, setName] = useState("");
-  const [roomid, setRoomid] = useState("");
   const [isjoined, setIsjoined] = useState(true);
+  function logRoom() {
+    if (iscreate) {
+      create(name);
+    } else {
+      join(name, id);
+    }
+  }
   return (
     <div className="flex flex-col w-96 rounded-lg bg-white m-5 shadow-md overflow-hidden">
-      {!isjoined && (
+      {!roomid && (
         <div>
           <div className="flex justify-between ">
             <input
@@ -29,22 +54,21 @@ export default function Gamelogger() {
           <div className="flex flex-col gap-2 px-4 py-5">
             <Inputfield value={name} setValue={setName} lable={"Your Name"} />
             {!iscreate && (
-              <Inputfield
-                value={roomid}
-                setValue={setRoomid}
-                lable={"Room ID"}
-              />
+              <Inputfield value={id} setValue={setId} lable={"Room ID"} />
             )}
-            <Button text={iscreate ? "Create Room" : "Join Room"} />
+            <Button
+              text={iscreate ? "Create Room" : "Join Room"}
+              onClick={logRoom}
+            />
           </div>
         </div>
       )}
-      {isjoined && (
+      {roomid && (
         <div className="px-4 py-5 flex flex-col gap-2">
           <div className="flex justify-between">
             <div>
               <div className="text-sm">Room ID</div>
-              <div className="text-2xl">XJ87G</div>
+              <div className="text-2xl">{roomid}</div>
             </div>
             <input
               type="button"
@@ -55,16 +79,16 @@ export default function Gamelogger() {
           </div>
           <div className="flex justify-evenly items-center">
             <div className="flex flex-col gap-1">
-              <Playerslot lable={"Player 1"} />
-              <Playerslot lable={"Player 3"} />
+              <Playerslot slotno={1} slot={slot1} setSlot={setSlot1} />
+              <Playerslot slotno={3} slot={slot3} setSlot={setSlot3} />
             </div>
             <div>VS</div>
             <div className="flex flex-col gap-1">
-              <Playerslot lable={"Player 2"} />
-              <Playerslot lable={"Player 4"} />
+              <Playerslot slotno={2} slot={slot2} setSlot={setSlot2} />
+              <Playerslot slotno={4} slot={slot4} setSlot={setSlot4} />
             </div>
           </div>
-          <Button text={"Start"} />
+          {admin && <Button text={"Start"} onClick={gameStart} />}
         </div>
       )}
     </div>
