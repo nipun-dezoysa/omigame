@@ -52,10 +52,10 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE round (
             roundid INTEGER PRIMARY KEY AUTOINCREMENT,
-            roundno INTEGER,
             gameid INTEGER,
             winner text,
             thurumpu text,
+            thowner INTEGER,
             FOREIGN KEY (gameid) REFERENCES game(gameid)
             )`,
       (err) => {
@@ -68,10 +68,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       `CREATE TABLE card (
             cardid INTEGER PRIMARY KEY AUTOINCREMENT,
             roundid INTEGER,
-            playerid INTEGER,
+            playerno INTEGER,
             type text,
             value INTEGER,
-            FOREIGN KEY (playerid) REFERENCES player(playerid),
             FOREIGN KEY (roundid) REFERENCES round(roundid)
             )`,
       (err) => {
@@ -85,7 +84,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             subroundid INTEGER PRIMARY KEY AUTOINCREMENT,
             subroundno INTEGER,
             roundid INTEGER,
-            winner text,
+            winner INTEGER,
             FOREIGN KEY (roundid) REFERENCES game(roundid)
             )`,
       (err) => {
@@ -98,10 +97,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       `CREATE TABLE hand (
             cardid INTEGER PRIMARY KEY AUTOINCREMENT,
             subroundid INTEGER,
-            playerid INTEGER,
+            playerno INTEGER,
             type text,
             value INTEGER,
-            FOREIGN KEY (playerid) REFERENCES player(playerid),
             FOREIGN KEY (subroundid) REFERENCES subround(subroundid)
             )`,
       (err) => {

@@ -16,7 +16,7 @@ export default function Playerslot({ slotno, slot, setSlot }) {
           "flex flex-col items-center justify-center border-2 font-semibold border-cyan-700 rounded-md text-slate-500 w-24 h-24 bg-cyan-500 "
         );
         setSlot({ name: name, player: "me" });
-        setUserSlot(slot);
+        setUserSlot(slotno);
       }
     } else if (slot.player == "me") {
       slotClick(0, slotno);
