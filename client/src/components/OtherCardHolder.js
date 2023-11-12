@@ -9,11 +9,9 @@ export default function OtherCardHolder({ no, styles }) {
     slot2,
     slot3,
     slot4,
-    slotCards1,
-    slotCards2,
-    slotCards3,
-    slotCards4,
+    slotCards
   } = useContext(GameContext);
+
   useEffect(() => {
     switch (no) {
       case 1:
@@ -31,29 +29,16 @@ export default function OtherCardHolder({ no, styles }) {
     }
   }, [slot1, slot2, slot3, slot4]);
   useEffect(() => {
-    var a = 0;
-    switch (no) {
-      case 1:
-        a = slotCards1;
-        break;
-      case 2:
-        a = slotCards2;
-        break;
-      case 3:
-        a = slotCards3;
-        break;
-      case 4:
-        a = slotCards4;
-        break;
-    }
-    var b=[];
-    for(var i=0;i<a;i++)b.push("a");
+    console.log(no," ",slotCards[no - 1]);
+    var a = slotCards[no - 1];
+    var b = [];
+    for (var i = 0; i < a; i++) b.push("a");
     setCardsCount(b);
-  }, [slotCards1, slotCards2, slotCards3, slotCards4]);
+  }, [slotCards[0], slotCards[1], slotCards[2], slotCards[3]]);
   return (
     <div className={styles + " bg-blue-700"}>
       {name}
-      {cardsCount.map((card)=><div>yo</div>)}
+      {[...cardsCount].map((card)=><div>yo</div>)}
     </div>
   );
 }

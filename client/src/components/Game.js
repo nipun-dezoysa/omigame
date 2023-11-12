@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { GameContext } from "../GameContextProvider";
 import OtherCardHolder from "./OtherCardHolder";
+import { motion } from "framer-motion";
 export default function Game() {
   const a = [1, 2, 3, 4, 5, 6];
   const { myCards, gameStatus, userSlot, thurumpu } = useContext(GameContext);
@@ -14,10 +15,11 @@ setSelectedCard(data);
     }
   };
   return (
+    //playerslot = userslot - 4 -slot
     <div className="h-[100vh] w-full flex flex-col justify-between gap-5 bg-green-500">
       <OtherCardHolder
         no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
-        styles={"w-full h-32"}
+        styles={"w-full h-32 flex"}
       />
       <div className="flex justify-between">
         <OtherCardHolder
@@ -37,15 +39,22 @@ setSelectedCard(data);
           onClick={okbutt}
         />
         {myCards.map((card) => (
-          <div
+          <motion.div layout
             key={card.type + card.value}
             className="w-20 h-32 bg-white flex justify-center items-center"
-            onClick={()=>select(card)}
+            onClick={() => select(card)}
           >
             <h1>{card.type + " " + card.value}</h1>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
   );
 }
+ const Card = ({children})=>{
+  return (
+    <motion.div layout>
+      {children}
+    </motion.div>
+  )
+ }

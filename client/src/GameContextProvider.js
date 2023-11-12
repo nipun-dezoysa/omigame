@@ -1,27 +1,37 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import { BiLogIn } from "react-icons/bi";
 import io from "socket.io-client";
 const socket = io.connect("http://localhost:3001");
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
   const [roomid, setRoomid] = useState(null);
+  const [gameStatus, setGameStatus] = useState({ status: "outside" });
+  const [thOwner, setThOwner] = useState(0);
+  const [roundid, setRoundid] = useState("");
+  const [roundThurumpu, setRoundThurumpu] = useState("");
 
   const [slot1, setSlot1] = useState(null);
   const [slot2, setSlot2] = useState(null);
   const [slot3, setSlot3] = useState(null);
   const [slot4, setSlot4] = useState(null);
 
-  const [slotCards1, setSlotCards1] = useState(0);
-  const [slotCards2, setSlotCards2] = useState(0);
-  const [slotCards3, setSlotCards3] = useState(0);
-  const [slotCards4, setSlotCards4] = useState(0);
+  const [slotCards, setSlotCards] = useState([0, 0, 0, 0]);
+  const slotCardsRef = React.useRef(slotCards);
+  const setSlotCardsRef = (data) => {
+    slotCardsRef.current = data;
+    setSlotCards(data);
+  };
 
   const [name, setName] = useState("");
   const [id, setId] = useState("");
   const [userSlot, setUserSlot] = useState(0);
   const [admin, setAdmin] = useState(false);
-  const [gameStatus, setGameStatus] = useState({ status: "outside" });
   const [myCards, setMyCards] = useState([]);
-  const [thOwner, setThOwner] = useState(0);
+  const mycardRef = React.useRef(myCards);
+  const setcardRef = (data) => {
+    mycardRef.current = data;
+    setMyCards(data);
+  };
 
   const create = (name) => {
     socket.emit("create_room", { name });
@@ -37,8 +47,9 @@ export function GameContextProvider({ children }) {
     socket.emit("game_start", { roomid });
   };
 
-  const thurumpu = (a) => {
-    socket.emit("thurumpu", a);
+  const thurumpu = (thurumpu) => {
+    socket.emit("thurumpu", { thurumpu, roundid, roomid });
+    setRoundThurumpu(thurumpu);
   };
 
   useEffect(() => {
@@ -49,41 +60,26 @@ export function GameContextProvider({ children }) {
       setAdmin(data);
     });
     socket.on("cards", (data) => {
-      if (myCards.length > 0) {
-        if (myCards[0] != data[0]) {
-          setMyCards([...myCards, data]);
-        }
-      } else {
-        setMyCards(data);
-      }
+      setcardRef([...mycardRef.current, ...data]);
     });
     socket.on("slot_cards", (data) => {
-      switch (data.slot) {
-        case 1:
-          data.status == 1
-            ? setSlotCards1(slotCards1 + data.count)
-            : setSlotCards1(slotCards1 - data.count);
-          break;
-        case 2:
-          data.status == 1
-            ? setSlotCards2(slotCards2 + data.count)
-            : setSlotCards2(slotCards2 - data.count);
-          break;
-        case 3:
-          data.status == 1
-            ? setSlotCards3(slotCards3 + data.count)
-            : setSlotCards3(slotCards3 - data.count);
-          break;
-        case 4:
-          data.status == 1
-            ? setSlotCards4(slotCards4 + data.count)
-            : setSlotCards4(slotCards4 - data.count);
-          break;
+      var a = slotCardsRef.current;
+      
+      if (data.status == 1) {
+        a[data.slot-1] += data.count;
+      } else {
+        a[data.slot-1] -= data.count;
       }
+      setSlotCardsRef(a);
     });
     socket.on("game_status", (data) => {
       setGameStatus(data);
       if (data.status == "thowner") setThOwner(data.slot);
+      if (data.status == "roundstart") {
+        setRoundid(data.roundid);
+        console.log("round" + data.roundid);
+      }
+      if (data.status == "thurumpu") setRoundThurumpu(data.thurumpu);
       //round start weddi okkoma var tika reset karanna oni
     });
     socket.on("slot_pull", ({ status, slot, name }) => {
@@ -159,11 +155,8 @@ export function GameContextProvider({ children }) {
         gameStart,
         myCards,
         gameStatus,
-        slotCards1,
-        slotCards2,
-        slotCards3,
-        slotCards4,
-        thurumpu
+        thurumpu,
+        slotCards,
       }}
     >
       {children}

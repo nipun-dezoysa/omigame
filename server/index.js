@@ -136,6 +136,17 @@ io.on("connection", (socket) => {
     );
   });
 
+  socket.on("thurumpu", ({ thurumpu, roundid, roomid }) => {
+    db.run("UPDATE round SET thurumpu=? WHERE roundid=?", [thurumpu, roundid]);
+    socket.to(roomid).emit("game_status", { status: "thurumpu", thurumpu });
+    for (var i = 2; i < 5; i++) {
+      sendAtha(roundid, roomid, i, 1);
+    }
+    for (var i = 1; i < 5; i++) {
+      sendAtha(roundid, roomid, i, 2);
+    }
+  });
+
   socket.on("disconnecting", () => {
     db.get("SELECT * FROM player WHERE socket=?", [socket.id], (err, row) => {
       if (row) {
@@ -150,6 +161,43 @@ io.on("connection", (socket) => {
     console.log(socket.id); // the Set contains at least the socket ID
   });
 });
+
+function sendAtha(roundid, roomid, playerno, atha) {
+  // console.log("send atha");
+  var sql;
+  if (atha == 1)
+    sql =
+      "SELECT type,value FROM card WHERE playerno=? AND roundid=? ORDER BY cardid ASC LIMIT 4";
+  else
+    sql =
+      "SELECT type,value FROM card WHERE playerno=? AND roundid=? ORDER BY cardid DESC LIMIT 4";
+  db.all(sql, [playerno, roundid], (err, rows) => {
+    if (err) console.log(err);
+    else {
+      if (rows) {
+        db.get(
+          "SELECT socket FROM player WHERE playerno=? AND roomid=?",
+          [playerno, roomid],
+          (error, row) => {
+            if (error) console.log(error);
+            else {
+              if (row) {
+                console.log(rows);
+                io.to(row.socket).emit("cards", rows);
+                io.in(roomid).emit("slot_cards", {
+                  status: 1,
+                  count: 4,
+                  slot: playerno,
+                });
+                // console.log(row);
+              } else console.log("gg");
+            }
+          }
+        );
+      } else console.log("ffff");
+    }
+  });
+}
 
 function game(gameid, roomid) {
   var roundid;
@@ -187,7 +235,7 @@ function game(gameid, roomid) {
                   db.run(
                     "INSERT INTO card (roundid,playerno,type,value) VALUES (?,?,?,?)",
                     [
-                      roomid,
+                      roundid,
                       cardOwner,
                       selection[randNum].type,
                       selection[randNum].val,
@@ -201,7 +249,7 @@ function game(gameid, roomid) {
                 }
                 db.all(
                   "SELECT type,value FROM card WHERE playerno=? AND roundid=? ORDER BY cardid ASC LIMIT 4",
-                  [thowner, roomid],
+                  [thowner, roundid],
                   (errd, rowd) => {
                     if (!errd) {
                       db.get(
@@ -232,8 +280,6 @@ function game(gameid, roomid) {
       }
     }
   );
-
-  
 }
 
 server.listen(3001, () => {
