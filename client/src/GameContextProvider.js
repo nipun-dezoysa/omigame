@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useRef } from "react";
 import { BiLogIn } from "react-icons/bi";
 import io from "socket.io-client";
 const socket = io.connect("http://localhost:3001");
@@ -15,7 +15,7 @@ export function GameContextProvider({ children }) {
   const [slot3, setSlot3] = useState(null);
   const [slot4, setSlot4] = useState(null);
 
-  const [slotCards, setSlotCards] = useState([0, 0, 0, 0]);
+  const [slotCards, setSlotCards] = useState(0);
   const slotCardsRef = React.useRef(slotCards);
   const setSlotCardsRef = (data) => {
     slotCardsRef.current = data;
@@ -25,6 +25,12 @@ export function GameContextProvider({ children }) {
   const [name, setName] = useState("");
   const [id, setId] = useState("");
   const [userSlot, setUserSlot] = useState(0);
+  const userslotRef = useRef(userSlot);
+  const setUserslotRef = (data) => {
+    userslotRef.current = data;
+    setUserSlot(data);
+  };
+
   const [admin, setAdmin] = useState(false);
   const [myCards, setMyCards] = useState([]);
   const mycardRef = React.useRef(myCards);
@@ -32,6 +38,7 @@ export function GameContextProvider({ children }) {
     mycardRef.current = data;
     setMyCards(data);
   };
+  const [okbutt, setOkbutt] = useState(false);
 
   const create = (name) => {
     socket.emit("create_room", { name });
@@ -41,6 +48,7 @@ export function GameContextProvider({ children }) {
   };
   const slotClick = (status, slot) => {
     socket.emit("slot_push", { status, slot, roomid, name });
+    setUserslotRef(slot);
   };
 
   const gameStart = () => {
@@ -63,18 +71,22 @@ export function GameContextProvider({ children }) {
       setcardRef([...mycardRef.current, ...data]);
     });
     socket.on("slot_cards", (data) => {
-      var a = slotCardsRef.current;
-      
-      if (data.status == 1) {
-        a[data.slot-1] += data.count;
-      } else {
-        a[data.slot-1] -= data.count;
-      }
-      setSlotCardsRef(a);
+      // var a = slotCardsRef.current;
+      // if (data.status == 1) {
+      //   a[data.slot-1] += data.count;
+      // } else {
+      //   a[data.slot-1] -= data.count;
+      // }
+      // setSlotCardsRef(a);
+      if (data.slot == 2) setSlotCardsRef(slotCardsRef.current + data.count);
     });
     socket.on("game_status", (data) => {
       setGameStatus(data);
-      if (data.status == "thowner") setThOwner(data.slot);
+      if (data.status == "thowner") {
+        setThOwner(data.slot);
+        console.log(userslotRef.current);
+        if (data.slot == userslotRef.current) setOkbutt(true);
+      }
       if (data.status == "roundstart") {
         setRoundid(data.roundid);
         console.log("round" + data.roundid);
@@ -157,6 +169,9 @@ export function GameContextProvider({ children }) {
         gameStatus,
         thurumpu,
         slotCards,
+        setMyCards,
+        okbutt,
+        setOkbutt,
       }}
     >
       {children}

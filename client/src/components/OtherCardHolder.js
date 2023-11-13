@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
+import { motion } from "framer-motion";
 export default function OtherCardHolder({ no, styles }) {
   const [name, setName] = useState("Player");
   const [cardsCount, setCardsCount] = useState([]);
@@ -29,16 +30,15 @@ export default function OtherCardHolder({ no, styles }) {
     }
   }, [slot1, slot2, slot3, slot4]);
   useEffect(() => {
-    console.log(no," ",slotCards[no - 1]);
-    var a = slotCards[no - 1];
+    // var a = slotCards[no - 1];
     var b = [];
-    for (var i = 0; i < a; i++) b.push("a");
+    for (var i = 0; i < slotCards; i++) b.push("a");
     setCardsCount(b);
-  }, [slotCards[0], slotCards[1], slotCards[2], slotCards[3]]);
+  }, [slotCards]);
   return (
-    <div className={styles + " bg-blue-700"}>
+    <div className={styles + " bg-blue-700 gap-1"}>
       {name}
-      {[...cardsCount].map((card)=><div>yo</div>)}
+      {[...cardsCount].map((card)=><motion.div layout className="bg-white">yo</motion.div>)}
     </div>
   );
 }

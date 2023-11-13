@@ -8,7 +8,7 @@ var randomstring = require("randomstring");
 const { start } = require("repl");
 
 const cards = [
-  { type: "h", val: 6 },
+  { type: "h", val: 14},
   { type: "h", val: 7 },
   { type: "h", val: 8 },
   { type: "h", val: 9 },
@@ -16,7 +16,7 @@ const cards = [
   { type: "h", val: 11 },
   { type: "h", val: 12 },
   { type: "h", val: 13 },
-  { type: "c", val: 6 },
+  { type: "c", val: 14 },
   { type: "c", val: 7 },
   { type: "c", val: 8 },
   { type: "c", val: 9 },
@@ -24,7 +24,7 @@ const cards = [
   { type: "c", val: 11 },
   { type: "c", val: 12 },
   { type: "c", val: 13 },
-  { type: "s", val: 6 },
+  { type: "s", val: 14 },
   { type: "s", val: 7 },
   { type: "s", val: 8 },
   { type: "s", val: 9 },
@@ -32,7 +32,7 @@ const cards = [
   { type: "s", val: 11 },
   { type: "s", val: 12 },
   { type: "s", val: 13 },
-  { type: "d", val: 6 },
+  { type: "d", val: 14 },
   { type: "d", val: 7 },
   { type: "d", val: 8 },
   { type: "d", val: 9 },
