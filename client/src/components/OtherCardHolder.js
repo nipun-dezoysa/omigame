@@ -1,16 +1,14 @@
 import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import { motion } from "framer-motion";
-export default function OtherCardHolder({ no, styles }) {
+export default function OtherCardHolder({ no, styles,cards }) {
   const [name, setName] = useState("Player");
   const [cardsCount, setCardsCount] = useState([]);
   const {
-    userSlot,
     slot1,
     slot2,
     slot3,
     slot4,
-    slotCards
   } = useContext(GameContext);
 
   useEffect(() => {
@@ -32,9 +30,9 @@ export default function OtherCardHolder({ no, styles }) {
   useEffect(() => {
     // var a = slotCards[no - 1];
     var b = [];
-    for (var i = 0; i < slotCards; i++) b.push("a");
+    for (var i = 0; i < cards; i++) b.push("a");
     setCardsCount(b);
-  }, [slotCards]);
+  }, [cards]);
   return (
     <div className={styles + " bg-blue-700 gap-1"}>
       {name}

@@ -61,6 +61,9 @@ export function GameContextProvider({ children }) {
   };
 
   useEffect(() => {
+    socket.on("throw_card", (data) => {
+      setOkbutt(true);
+    });
     socket.on("room", (data) => {
       setRoomid(data);
     });
@@ -70,26 +73,15 @@ export function GameContextProvider({ children }) {
     socket.on("cards", (data) => {
       setcardRef([...mycardRef.current, ...data]);
     });
-    socket.on("slot_cards", (data) => {
-      // var a = slotCardsRef.current;
-      // if (data.status == 1) {
-      //   a[data.slot-1] += data.count;
-      // } else {
-      //   a[data.slot-1] -= data.count;
-      // }
-      // setSlotCardsRef(a);
-      if (data.slot == 2) setSlotCardsRef(slotCardsRef.current + data.count);
-    });
+    
     socket.on("game_status", (data) => {
       setGameStatus(data);
       if (data.status == "thowner") {
         setThOwner(data.slot);
-        console.log(userslotRef.current);
         if (data.slot == userslotRef.current) setOkbutt(true);
       }
       if (data.status == "roundstart") {
         setRoundid(data.roundid);
-        console.log("round" + data.roundid);
       }
       if (data.status == "thurumpu") setRoundThurumpu(data.thurumpu);
       //round start weddi okkoma var tika reset karanna oni
@@ -172,6 +164,8 @@ export function GameContextProvider({ children }) {
         setMyCards,
         okbutt,
         setOkbutt,
+        socket,
+        roundid,
       }}
     >
       {children}

@@ -8,7 +8,7 @@ var randomstring = require("randomstring");
 const { start } = require("repl");
 
 const cards = [
-  { type: "h", val: 14},
+  { type: "h", val: 14 },
   { type: "h", val: 7 },
   { type: "h", val: 8 },
   { type: "h", val: 9 },
@@ -144,7 +144,28 @@ io.on("connection", (socket) => {
     }
     for (var i = 1; i < 5; i++) {
       sendAtha(roundid, roomid, i, 2);
+      io.in(roomid).emit("game_status", {
+        status: "throwing",
+      });
     }
+    socket.emit("throw_card", socket.id);
+  });
+
+  socket.on("place_card", ({ card, slot, roomid, roundid }) => {
+    db.get(
+      "SELECT * FROM card WHERE roundid=? AND playerno=? AND type=? AND value=?",
+      [roundid, slot, card.type, card.value],
+      (err, row) => {
+        console.log(err);
+        if (row) {
+          db.run(
+            "DELETE FROM card WHERE roundid=? AND playerno=? AND type=? AND value=?",
+            [roundid, slot, card.type, card.value]
+          );
+
+        }
+      }
+    );
   });
 
   socket.on("disconnecting", () => {
@@ -182,7 +203,6 @@ function sendAtha(roundid, roomid, playerno, atha) {
             if (error) console.log(error);
             else {
               if (row) {
-                console.log(rows);
                 io.to(row.socket).emit("cards", rows);
                 io.in(roomid).emit("slot_cards", {
                   status: 1,
@@ -190,7 +210,7 @@ function sendAtha(roundid, roomid, playerno, atha) {
                   slot: playerno,
                 });
                 // console.log(row);
-              } else console.log("gg");
+              }
             }
           }
         );
