@@ -75,13 +75,16 @@ export default function Game() {
     setSlot4Cards(data);
   };
 
+  const [slot2img, setSlot2img] = useState(null);
+  const [slot3img, setSlot3img] = useState(null);
+  const [slot4img, setSlot4img] = useState(null);
+
   const select = (data) => {
     setSelectedCard(data);
   };
   const ok = () => {
     if (gameStatus.status == "thowner") {
       thurumpu(selectedCard.type);
-      setOkbutt(false);
     } else {
       var a = myCards.filter(
         (card) =>
@@ -89,20 +92,43 @@ export default function Game() {
       );
       setMyCards(a);
       setUserThrow(cardsimg[selectedCard.type + selectedCard.value + ""]);
-      socket.emit("place_card",{card:selectedCard,slot:userSlot,roomid,roundid});
+      socket.emit("place_card", {
+        card: selectedCard,
+        slot: userSlot,
+        roomid,
+        roundid,
+      });
     }
+    setOkbutt(false);
+    setSelectedCard("");
   };
 
   useEffect(() => {
     socket.on("slot_cards", (data) => {
-      
-      var s2 = userSlot + 1 < 4 ? userSlot + 1 : userSlot - 3;
-      var s3 = userSlot + 2 < 4 ? userSlot + 2 : userSlot - 2;
-      var s4 = userSlot + 3 < 4 ? userSlot + 3 : userSlot - 1;
-      if (data.slot == s2) setSlot2CardsRef(data.count+slot2CardsRef.current);
-      if (data.slot == s3) setSlot3CardsRef(data.count+slot3CardsRef.current);
-      if (data.slot == s4) setSlot4CardsRef(data.count+slot3CardsRef.current);
-      console.log(s3,userSlot);
+      var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
+      var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
+      var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
+      if (data.slot == s2) setSlot2CardsRef(data.count + slot2CardsRef.current);
+      if (data.slot == s3) setSlot3CardsRef(data.count + slot3CardsRef.current);
+      if (data.slot == s4) setSlot4CardsRef(data.count + slot3CardsRef.current);
+    });
+    socket.on("player_place_card", (data) => {
+      console.log(data);
+      var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
+      var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
+      var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
+      if (data.slot == s2) {
+        setSlot2img(cardsimg["" + data.type + data.value]);
+        setSlot2CardsRef(slot2CardsRef.current - 1);
+      }
+      if (data.slot == s3) {
+        setSlot3img(cardsimg["" + data.type + data.value]);
+        setSlot3CardsRef(slot3CardsRef.current - 1);
+      }
+      if (data.slot == s4) {
+        setSlot4img(cardsimg["" + data.type + data.value]);
+        setSlot4CardsRef(slot4CardsRef.current - 1);
+      }
     });
   }, [socket]);
 
@@ -122,11 +148,13 @@ export default function Game() {
         />
         <div className="flex justify-center items-center gap-2">
           <div className="w-[120px] h-[175px]">
-            <img src={cardImg} alt="" />
+            {slot4img && <img src={require(`./../cards/${slot4img}`)} alt="" />}
           </div>
           <div className="flex flex-col gap-3">
             <div className="w-[120px] h-[175px]">
-              <img src={cardImg} alt="" />
+              {slot3img && (
+                <img src={require(`./../cards/${slot3img}`)} alt="" />
+              )}
             </div>
             <div className="w-[120px] h-[175px]">
               {userThrow && (
@@ -135,7 +163,7 @@ export default function Game() {
             </div>
           </div>
           <div className="w-[120px] h-[175px]">
-            <img src={cardImg} alt="" />
+            {slot2img && <img src={require(`./../cards/${slot2img}`)} alt="" />}
           </div>
         </div>
         <OtherCardHolder

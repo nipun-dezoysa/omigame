@@ -136,7 +136,7 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("thurumpu", ({ thurumpu, roundid, roomid }) => {
+  socket.on("thurumpu", ({ thurumpu, roundid, roomid, slot }) => {
     db.run("UPDATE round SET thurumpu=? WHERE roundid=?", [thurumpu, roundid]);
     socket.to(roomid).emit("game_status", { status: "thurumpu", thurumpu });
     for (var i = 2; i < 5; i++) {
@@ -148,7 +148,7 @@ io.on("connection", (socket) => {
         status: "throwing",
       });
     }
-    socket.emit("throw_card", socket.id);
+    io.in(roomid).emit("throw_card", slot);
   });
 
   socket.on("place_card", ({ card, slot, roomid, roundid }) => {
@@ -156,13 +156,84 @@ io.on("connection", (socket) => {
       "SELECT * FROM card WHERE roundid=? AND playerno=? AND type=? AND value=?",
       [roundid, slot, card.type, card.value],
       (err, row) => {
-        console.log(err);
         if (row) {
           db.run(
             "DELETE FROM card WHERE roundid=? AND playerno=? AND type=? AND value=?",
             [roundid, slot, card.type, card.value]
           );
-
+          socket.to(roomid).emit("player_place_card", {
+            slot,
+            type: card.type,
+            value: card.value,
+          });
+          db.get(
+            "SELECT * FROM subround WHERE roundid=? AND winner='' ORDER BY subroundid DESC",
+            [roundid],
+            (error, rows) => {
+              if (error) console.log(error);
+              if (rows) {
+                db.run(
+                  "INSERT INTO hand(subroundid,playerno,type,value) VALUES (?,?,?,?)",
+                  [rows.subroundid, slot, card.type, card.value]
+                );
+                db.all(
+                  "SELECT * FROM hand WHERE subroundid=?",
+                  [rows.subroundid],
+                  (errss, rowss) => {
+                    if (rowss.length < 4) {
+                      var a = slot + 1 > 4 ? 1 : slot + 1;
+                      io.in(roomid).emit("throw_card", a);
+                    } else {
+                      db.get(
+                        "SELECT * FROM round WHERE roundid=?",
+                        [roundid],
+                        (errsss, rowsss) => {
+                          var wasiya = rowss[0];
+                          for (var i = 1; i < 4; i++) {
+                            if (rowss[i].type == wasiya.type) {
+                              if (rowss[i].value > wasiya.value) {
+                                wasiya = rowss[i];
+                              }
+                            } else {
+                              if (rowss[i].type == rowsss.thurumpu) {
+                                wasiya = rowss[i];
+                              }
+                            }
+                          }
+                          console.log(wasiya);
+                          var winner = wasiya.playerno % 2;
+                          db.run(
+                            "UPDATE subround SET winner=? WHERE subroundid=?",
+                            [winner, rows.subroundid]
+                          );
+                          gameEnd(roomid, roundid, rows.subroundid, winner);
+                        }
+                      );
+                    }
+                  }
+                );
+              } else {
+                db.run("INSERT INTO subround(roundid,winner) VALUES(?,?)", [
+                  roundid,
+                  "",
+                ]);
+                db.get(
+                  "SELECT * FROM subround WHERE roundid=? AND winner='' ORDER BY subroundid DESC",
+                  [roundid],
+                  (errss, rowss) => {
+                    if (rowss) {
+                      db.run(
+                        "INSERT INTO hand(subroundid,playerno,type,value) VALUES (?,?,?,?)",
+                        [rowss.subroundid, slot, card.type, card.value]
+                      );
+                      var a = slot + 1 > 4 ? 1 : slot + 1;
+                      io.in(roomid).emit("throw_card", a);
+                    }
+                  }
+                );
+              }
+            }
+          );
         }
       }
     );
@@ -300,6 +371,19 @@ function game(gameid, roomid) {
       }
     }
   );
+}
+
+function gameEnd(roomid, roundid, subroundid, winner) {
+  db.all("SELECT winner,COUNT(*) FROM subround GROUP BY winner",[],(err,row)=>{
+    if(row){
+      if(row.length==2){
+        
+
+      }else{
+        io.to(roomid).emit("Results",{status:"sub",winner});
+      }
+    }
+  })
 }
 
 server.listen(3001, () => {

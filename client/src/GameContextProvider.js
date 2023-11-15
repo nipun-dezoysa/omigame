@@ -56,13 +56,20 @@ export function GameContextProvider({ children }) {
   };
 
   const thurumpu = (thurumpu) => {
-    socket.emit("thurumpu", { thurumpu, roundid, roomid });
+    socket.emit("thurumpu", {
+      thurumpu,
+      roundid,
+      roomid,
+      slot: userslotRef.current,
+    });
     setRoundThurumpu(thurumpu);
   };
 
   useEffect(() => {
     socket.on("throw_card", (data) => {
-      setOkbutt(true);
+      if (data == userslotRef.current) {
+        setOkbutt(true);
+      }
     });
     socket.on("room", (data) => {
       setRoomid(data);
@@ -73,7 +80,7 @@ export function GameContextProvider({ children }) {
     socket.on("cards", (data) => {
       setcardRef([...mycardRef.current, ...data]);
     });
-    
+
     socket.on("game_status", (data) => {
       setGameStatus(data);
       if (data.status == "thowner") {

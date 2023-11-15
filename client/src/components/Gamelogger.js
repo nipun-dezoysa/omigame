@@ -26,7 +26,7 @@ export default function Gamelogger() {
     gameStart,
     gameStatus,
   } = useContext(GameContext);
-  const [iscreate, setIscreate] = useState(true);
+  const [iscreate, setIscreate] = useState(false);
   const [isjoined, setIsjoined] = useState(true);
   function logRoom() {
     if (iscreate) {

@@ -82,7 +82,6 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     db.run(
       `CREATE TABLE subround (
             subroundid INTEGER PRIMARY KEY AUTOINCREMENT,
-            subroundno INTEGER,
             roundid INTEGER,
             winner INTEGER,
             FOREIGN KEY (roundid) REFERENCES game(roundid)
