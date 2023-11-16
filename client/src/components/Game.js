@@ -79,6 +79,12 @@ export default function Game() {
   const [slot3img, setSlot3img] = useState(null);
   const [slot4img, setSlot4img] = useState(null);
 
+  const [ourAths, setOurAths] = useState(0);
+  const [oppoAths, setOppoAths] = useState(0);
+
+  const [ourPoints, setOurPoints] = useState(0);
+  const [oppoPoints, setOppoPoints] = useState(0);
+
   const select = (data) => {
     setSelectedCard(data);
   };
@@ -104,13 +110,48 @@ export default function Game() {
   };
 
   useEffect(() => {
+    socket.on("result", (data) => {
+      setSlot2img(null);
+      setSlot3img(null);
+      setSlot4img(null);
+      setUserThrow(null);
+      if (data.status == "sub") {
+        if (data.winner == userSlot % 2) {
+          setOurAths(data.a);
+          setOppoAths(data.b);
+        } else {
+          setOurAths(data.b);
+          setOppoAths(data.a);
+        }
+      }
+      if (data.status == "round") {
+        setOurAths(0);
+        setOppoAths(0);
+        if (data.winner == userSlot % 2) {
+          setOurPoints(data.a);
+          setOppoPoints(data.b);
+        } else {
+          setOurPoints(data.b);
+          setOppoPoints(data.a);
+        }
+      }
+      if (data.status == "seporu") {
+        setOurAths(0);
+        setOppoAths(0);
+      }
+    });
     socket.on("slot_cards", (data) => {
       var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
       var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
       var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
-      if (data.slot == s2) setSlot2CardsRef(data.count + slot2CardsRef.current);
-      if (data.slot == s3) setSlot3CardsRef(data.count + slot3CardsRef.current);
-      if (data.slot == s4) setSlot4CardsRef(data.count + slot3CardsRef.current);
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].slot == s2)
+          setSlot2CardsRef(data[i].count);
+        if (data[i].slot == s3)
+          setSlot3CardsRef(data[i].count);
+        if (data[i].slot == s4)
+          setSlot4CardsRef(data[i].count);
+      }
     });
     socket.on("player_place_card", (data) => {
       console.log(data);
@@ -134,17 +175,29 @@ export default function Game() {
 
   return (
     //playerslot = userslot - 4 -slot
-    <div className="h-[100vh] w-full flex flex-col justify-between gap-5 ">
-      <OtherCardHolder
-        no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
-        cards={slot3Cards}
-        styles={"w-full h-32 flex"}
-      />
+    <div className="h-[100vh] w-full flex flex-col justify-between gap-5">
+      <div className="flex justify-between">
+        <h1>
+          {ourAths}:{oppoAths}
+        </h1>
+
+        <OtherCardHolder
+          place={1}
+          no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
+          cards={slot3Cards}
+          styles={"flex h-[100px]"}
+        />
+        <h1>
+          {ourPoints}:{oppoPoints}
+        </h1>
+      </div>
+
       <div className="flex justify-between">
         <OtherCardHolder
+          place={2}
           no={userSlot + 3 > 4 ? userSlot - 1 : userSlot + 3}
           cards={slot4Cards}
-          styles={"w-32 flex flex-col"}
+          styles={"flex flex-col w-[100px] flex-col-reverse"}
         />
         <div className="flex justify-center items-center gap-2">
           <div className="w-[120px] h-[175px]">
@@ -167,9 +220,10 @@ export default function Game() {
           </div>
         </div>
         <OtherCardHolder
+          place={3}
           no={userSlot + 1 > 4 ? userSlot - 3 : userSlot + 1}
           cards={slot2Cards}
-          styles={"w-32 flex flex-col"}
+          styles={"flex flex-col w-[100px]"}
         />
       </div>
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">

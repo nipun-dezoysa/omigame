@@ -89,6 +89,7 @@ export function GameContextProvider({ children }) {
       }
       if (data.status == "roundstart") {
         setRoundid(data.roundid);
+        setcardRef([]);
       }
       if (data.status == "thurumpu") setRoundThurumpu(data.thurumpu);
       //round start weddi okkoma var tika reset karanna oni

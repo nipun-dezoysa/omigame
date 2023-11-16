@@ -1,7 +1,16 @@
 import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import { motion } from "framer-motion";
-export default function OtherCardHolder({ no, styles,cards }) {
+export default function OtherCardHolder({ no, styles,cards,place }) {
+  var full = "half_back.png";
+  var side = "half_back_side.png";
+  if (place == 2) {
+    full = "left_half_back.png";
+    side = "left_half_back_side.png";
+  } else if (place == 3) {
+    full = "right_half_back.png";
+    side = "right_half_back_side.png";
+  }
   const [name, setName] = useState("Player");
   const [cardsCount, setCardsCount] = useState([]);
   const {
@@ -34,9 +43,20 @@ export default function OtherCardHolder({ no, styles,cards }) {
     setCardsCount(b);
   }, [cards]);
   return (
-    <div className={styles + " bg-blue-700 gap-1"}>
+    <div className={styles}>
       {name}
-      {[...cardsCount].map((card)=><motion.div layout className="bg-white">yo</motion.div>)}
+      {[...cardsCount].map((card, index) => (
+        <motion.div layout>
+          <img
+          className="h-full w-full"
+            src={
+              index == 0
+                ? require(`./../cards/${full}`)
+                : require(`./../cards/${side}`)
+            }
+          />
+        </motion.div>
+      ))}
     </div>
   );
 }

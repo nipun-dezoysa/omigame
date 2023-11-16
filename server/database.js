@@ -25,6 +25,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       `CREATE TABLE game (
             gameid INTEGER PRIMARY KEY AUTOINCREMENT,
             roomid text,
+            team0 INTEGER,
+            team1 INTEGER,
             FOREIGN KEY (roomid) REFERENCES room(roomid)
             )`,
       (err) => {
@@ -53,7 +55,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       `CREATE TABLE round (
             roundid INTEGER PRIMARY KEY AUTOINCREMENT,
             gameid INTEGER,
-            winner text,
+            winner INTEGER,
             thurumpu text,
             thowner INTEGER,
             FOREIGN KEY (gameid) REFERENCES game(gameid)
