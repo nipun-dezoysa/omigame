@@ -44,11 +44,11 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
   }, [cards]);
   return (
     <div className={styles}>
-      {name}
+      <div>{name}</div>
       {[...cardsCount].map((card, index) => (
         <motion.div layout>
           <img
-          className="h-full w-full"
+            className="h-full w-full"
             src={
               index == 0
                 ? require(`./../cards/${full}`)

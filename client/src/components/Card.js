@@ -55,13 +55,13 @@ export default function Card({ selectS, card, myCards }) {
 
   // },[myCards]);
   return (
-    <motion.div layout className={styles}>
+    <div className="card">
       {/* <h1>{card.type + " " + card.value}</h1> */}
       <img
-        className="w-[120px]"
+        className=" cardimg"
         onClick={() => selectS(card)}
         src={require(`./../cards/${imgsrc}`)}
       />
-    </motion.div>
+    </div>
   );
 }

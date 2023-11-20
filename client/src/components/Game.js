@@ -177,9 +177,20 @@ export default function Game() {
     //playerslot = userslot - 4 -slot
     <div className="h-[100vh] w-full flex flex-col justify-between gap-5">
       <div className="flex justify-between">
-        <h1>
-          {ourAths}:{oppoAths}
-        </h1>
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="text-sm">Room ID</h1>
+          <h1 className="text-xl font-bold">{roomid}</h1>
+          <div className="flex">
+            <div>
+              <h1 className="text-sm">Your Team</h1>
+              <h1>{ourAths}</h1>
+            </div>
+            <div>
+              <h1 className="text-sm">Opponent</h1>
+              <h1>{oppoAths}</h1>
+            </div>
+          </div>
+        </div>
 
         <OtherCardHolder
           place={1}
@@ -235,11 +246,11 @@ export default function Game() {
             onClick={ok}
           />
         )}
-        <div className="flex w-full justify-center gap-1">
+        <div className="flex w-full  overflow-hidden justify-center gap-1">
           {myCards.map((card, index) => {
             return (
               <Card
-                key={index}
+                key={card.type + card.value}
                 myCards={myCards}
                 selectS={select}
                 card={card}

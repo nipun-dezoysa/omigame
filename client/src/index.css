@@ -6,5 +6,13 @@ body{
   @apply bg-slate-200;
 }
 .card{
-  @apply  bg-white shrink-0 relative left-0 flex justify-center items-center;
+  width: 60px;
+}
+.cardimg{
+  @apply  absolute cursor-pointer ;
+  width: 120px;
+  transition: all linear 0.5s;
+}
+.cardimg:hover{
+  top: -10px;
 }
