@@ -52,6 +52,8 @@ export default function Game() {
     setOkbutt,
     roomid,
     roundid,
+    roundThurumpu,
+    setRoundThurumpu,
   } = useContext(GameContext);
   const [selectedCard, setSelectedCard] = useState("");
   const [userThrow, setUserThrow] = useState(null);
@@ -89,24 +91,28 @@ export default function Game() {
     setSelectedCard(data);
   };
   const ok = () => {
-    if (gameStatus.status == "thowner") {
-      thurumpu(selectedCard.type);
-    } else {
-      var a = myCards.filter(
-        (card) =>
-          !(card.type == selectedCard.type && card.value == selectedCard.value)
-      );
-      setMyCards(a);
-      setUserThrow(cardsimg[selectedCard.type + selectedCard.value + ""]);
-      socket.emit("place_card", {
-        card: selectedCard,
-        slot: userSlot,
-        roomid,
-        roundid,
-      });
+    if (selectedCard != "") {
+      if (gameStatus.status == "thowner") {
+        thurumpu(selectedCard.type);
+      } else {
+        var a = myCards.filter(
+          (card) =>
+            !(
+              card.type == selectedCard.type && card.value == selectedCard.value
+            )
+        );
+        setMyCards(a);
+        setUserThrow(cardsimg[selectedCard.type + selectedCard.value + ""]);
+        socket.emit("place_card", {
+          card: selectedCard,
+          slot: userSlot,
+          roomid,
+          roundid,
+        });
+      }
+      setOkbutt(false);
+      setSelectedCard("");
     }
-    setOkbutt(false);
-    setSelectedCard("");
   };
 
   useEffect(() => {
@@ -127,6 +133,10 @@ export default function Game() {
       if (data.status == "round") {
         setOurAths(0);
         setOppoAths(0);
+        setRoundThurumpu(null);
+        setSlot2CardsRef(0);
+        setSlot3CardsRef(0);
+        setSlot4CardsRef(0);
         if (data.winner == userSlot % 2) {
           setOurPoints(data.a);
           setOppoPoints(data.b);
@@ -138,6 +148,10 @@ export default function Game() {
       if (data.status == "seporu") {
         setOurAths(0);
         setOppoAths(0);
+        setRoundThurumpu(null);
+        setSlot2CardsRef(0);
+        setSlot3CardsRef(0);
+        setSlot4CardsRef(0);
       }
     });
     socket.on("slot_cards", (data) => {
@@ -145,12 +159,9 @@ export default function Game() {
       var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
       var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
       for (var i = 0; i < data.length; i++) {
-        if (data[i].slot == s2)
-          setSlot2CardsRef(data[i].count);
-        if (data[i].slot == s3)
-          setSlot3CardsRef(data[i].count);
-        if (data[i].slot == s4)
-          setSlot4CardsRef(data[i].count);
+        if (data[i].slot == s2) setSlot2CardsRef(data[i].count);
+        if (data[i].slot == s3) setSlot3CardsRef(data[i].count);
+        if (data[i].slot == s4) setSlot4CardsRef(data[i].count);
       }
     });
     socket.on("player_place_card", (data) => {
@@ -175,32 +186,40 @@ export default function Game() {
 
   return (
     //playerslot = userslot - 4 -slot
-    <div className="h-[100vh] w-full flex flex-col justify-between gap-5">
-      <div className="flex justify-between">
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="text-sm">Room ID</h1>
-          <h1 className="text-xl font-bold">{roomid}</h1>
-          <div className="flex">
-            <div>
+    <div className="h-[100vh] w-full flex flex-col justify-between">
+      <div>
+        <div className="flex bg-slate-300 justify-between items-center p-1">
+          <div>
+            <h1 className="text-sm">Room ID</h1>
+            <h1 className="text-xl font-bold">{roomid}</h1>
+          </div>
+          <div className="flex gap-1">
+            <div className="flex flex-col items-center">
               <h1 className="text-sm">Your Team</h1>
-              <h1>{ourAths}</h1>
+              <h1 className="text-xl font-bold">{ourAths}</h1>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <h1 className="text-sm">Opponent</h1>
-              <h1>{oppoAths}</h1>
+              <h1 className="text-xl font-bold">{oppoAths}</h1>
             </div>
           </div>
+          <div className="w-10">
+            {roundThurumpu && (
+              <img src={require(`./../cards/${roundThurumpu}.png`)} alt="" />
+            )}
+          </div>
         </div>
-
-        <OtherCardHolder
-          place={1}
-          no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
-          cards={slot3Cards}
-          styles={"flex h-[100px]"}
-        />
-        <h1>
-          {ourPoints}:{oppoPoints}
-        </h1>
+        <div className="flex justify-between">
+          <OtherCardHolder
+            place={1}
+            no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
+            cards={slot3Cards}
+            styles={"flex h-[60px] lg:h-[100px]"}
+          />
+          <h1>
+            {ourPoints}:{oppoPoints}
+          </h1>
+        </div>
       </div>
 
       <div className="flex justify-between">
@@ -208,25 +227,25 @@ export default function Game() {
           place={2}
           no={userSlot + 3 > 4 ? userSlot - 1 : userSlot + 3}
           cards={slot4Cards}
-          styles={"flex flex-col w-[100px] flex-col-reverse"}
+          styles={"flex flex-col w-[60px] lg:w-[100px] flex-col-reverse"}
         />
         <div className="flex justify-center items-center gap-2">
-          <div className="w-[120px] h-[175px]">
+          <div className="w-[30%] md:w-[120px] md:h-[175px]">
             {slot4img && <img src={require(`./../cards/${slot4img}`)} alt="" />}
           </div>
-          <div className="flex flex-col gap-3">
-            <div className="w-[120px] h-[175px]">
+          <div className="flex flex-col gap-3 w-[30%]">
+            <div className="w-full h-[110px] md:w-[120px] md:h-[175px]">
               {slot3img && (
                 <img src={require(`./../cards/${slot3img}`)} alt="" />
               )}
             </div>
-            <div className="w-[120px] h-[175px]">
+            <div className="w-full h-[110px] md:w-[120px] md:h-[175px]">
               {userThrow && (
                 <img src={require(`./../cards/${userThrow}`)} alt="" />
               )}
             </div>
           </div>
-          <div className="w-[120px] h-[175px]">
+          <div className="w-[30%] md:w-[120px] md:h-[175px]">
             {slot2img && <img src={require(`./../cards/${slot2img}`)} alt="" />}
           </div>
         </div>
@@ -234,19 +253,19 @@ export default function Game() {
           place={3}
           no={userSlot + 1 > 4 ? userSlot - 3 : userSlot + 1}
           cards={slot2Cards}
-          styles={"flex flex-col w-[100px]"}
+          styles={"flex flex-col w-[60px] lg:w-[100px] items-end"}
         />
       </div>
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">
         {okbutt && (
           <input
-            className="absolute top-[-60px] bg-cyan-900 py-3 px-10 text-white"
+            className="absolute top-[-60px] bg-cyan-900 py-3 px-10 text-white rounded-lg"
             type="button"
             value="OK"
             onClick={ok}
           />
         )}
-        <div className="flex w-full  overflow-hidden justify-center gap-1">
+        <div className="flex w-full  overflow-hidden lg:ustify-center">
           {myCards.map((card, index) => {
             return (
               <Card

@@ -6,13 +6,8 @@ body{
   @apply bg-slate-200;
 }
 .card{
-  width: 60px;
+  @apply w-[10%] lg:w-[60px];
 }
 .cardimg{
-  @apply  absolute cursor-pointer ;
-  width: 120px;
-  transition: all linear 0.5s;
-}
-.cardimg:hover{
-  top: -10px;
+  @apply  absolute w-[120px] lg:w-[120px] cursor-pointer outline-none ring ring-violet-300 rounded-sm hover:top-[-20px];
 }

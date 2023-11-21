@@ -58,7 +58,7 @@ export default function Card({ selectS, card, myCards }) {
     <div className="card">
       {/* <h1>{card.type + " " + card.value}</h1> */}
       <img
-        className=" cardimg"
+        className="cardimg"
         onClick={() => selectS(card)}
         src={require(`./../cards/${imgsrc}`)}
       />

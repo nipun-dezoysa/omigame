@@ -44,7 +44,7 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
   }, [cards]);
   return (
     <div className={styles}>
-      <div>{name}</div>
+      <div className="text-sm min-w-[60px]">{name}</div>
       {[...cardsCount].map((card, index) => (
         <motion.div layout>
           <img
