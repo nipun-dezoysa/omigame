@@ -3,8 +3,7 @@ import { GameContext } from "../GameContextProvider";
 import OtherCardHolder from "./OtherCardHolder";
 import { motion } from "framer-motion";
 import Card from "./Card";
-import cardImg from "./playingcard.png";
-import { Socket } from "socket.io-client";
+import Pausescreen from "./Pausescreen";
 const cardsimg = {
   h7: "7_of_hearts.png",
   h8: "8_of_hearts.png",
@@ -187,6 +186,7 @@ export default function Game() {
   return (
     //playerslot = userslot - 4 -slot
     <div className="h-[100vh] w-full flex flex-col justify-between">
+      {/* <Pausescreen/> */}
       <div>
         <div className="flex bg-slate-300 justify-between items-center p-1">
           <div>
@@ -265,12 +265,13 @@ export default function Game() {
             onClick={ok}
           />
         )}
-        <div className="flex w-full  overflow-hidden lg:ustify-center">
+        <div className="flex w-full  overflow-hidden justify-center">
           {myCards.map((card, index) => {
+            var size= myCards.length;
             return (
               <Card
                 key={card.type + card.value}
-                myCards={myCards}
+                style={(size-1==index)?"lastcard":"card"}
                 selectS={select}
                 card={card}
               />

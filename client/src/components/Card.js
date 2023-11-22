@@ -1,7 +1,3 @@
-import { motion } from "framer-motion";
-import cardImg from "./playingcard.png";
-import { useEffect, useState, useRef } from "react";
-import cardsss from "../cards/7_of_hearts.png";
 const cardsimg = {
   h7: "7_of_hearts.png",
   h8: "8_of_hearts.png",
@@ -37,26 +33,10 @@ const cardsimg = {
   s14: "ace_of_spades.png",
 };
 
-export default function Card({ selectS, card, myCards }) {
+export default function Card({ selectS, card, style }) {
   const imgsrc = cardsimg[card.type+card.value+""];
-  const [styles, setStyles] = useState("relative shrink-0");
-  const stylesRef = useRef(styles);
-  const setStylesRef = (data) => {
-    stylesRef.current = data;
-    setStyles(data);
-  };
-  // useEffect(()=>{
-  //     for(var i=0;i<myCards.length;i++){
-  //         if((card.type==myCards[i].type)&&(card.value==myCards[i].value)){
-  //             setStylesRef("relative shrink-0 left-[-"+i+"00px]");
-  //             console.log(i,stylesRef,card);
-  //         }
-  //     }
-
-  // },[myCards]);
   return (
-    <div className="card">
-      {/* <h1>{card.type + " " + card.value}</h1> */}
+    <div className={style}>
       <img
         className="cardimg"
         onClick={() => selectS(card)}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import { motion } from "framer-motion";
+
 export default function OtherCardHolder({ no, styles,cards,place }) {
   var full = "half_back.png";
   var side = "half_back_side.png";

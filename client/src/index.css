@@ -8,6 +8,9 @@ body{
 .card{
   @apply w-[10%] lg:w-[60px];
 }
+.lastcard{
+  @apply w-[30%] lg:w-[60px];
+}
 .cardimg{
   @apply  absolute w-[120px] lg:w-[120px] cursor-pointer outline-none ring ring-violet-300 rounded-sm hover:top-[-20px];
 }
