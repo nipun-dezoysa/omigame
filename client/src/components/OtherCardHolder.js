@@ -42,6 +42,7 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
     var b = [];
     for (var i = 0; i < cards; i++) b.push("a");
     setCardsCount(b);
+    console.log(cards);
   }, [cards]);
   return (
     <div className={styles}>

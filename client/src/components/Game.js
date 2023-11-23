@@ -1,8 +1,8 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { GameContext } from "../GameContextProvider";
 import OtherCardHolder from "./OtherCardHolder";
-import { motion } from "framer-motion";
 import Card from "./Card";
+import Closedcards from "./Closedcards";
 import Pausescreen from "./Pausescreen";
 const cardsimg = {
   h7: "7_of_hearts.png",
@@ -114,13 +114,26 @@ export default function Game() {
     }
   };
 
+  function setSlotsEmpty(){
+    setSlot2img(null);
+    setSlot3img(null);
+    setSlot4img(null);
+    setUserThrow(null);
+  }
+function resetGame(){
+  setSlotsEmpty();
+  setOurAths(0);
+  setOppoAths(0);
+  setRoundThurumpu(null);
+  setSlot2CardsRef(0);
+  setSlot3CardsRef(0);
+  setSlot4CardsRef(0);
+}
   useEffect(() => {
     socket.on("result", (data) => {
-      setSlot2img(null);
-      setSlot3img(null);
-      setSlot4img(null);
-      setUserThrow(null);
+      
       if (data.status == "sub") {
+        setTimeout(()=>{setSlotsEmpty();
         if (data.winner == userSlot % 2) {
           setOurAths(data.a);
           setOppoAths(data.b);
@@ -128,14 +141,12 @@ export default function Game() {
           setOurAths(data.b);
           setOppoAths(data.a);
         }
+        if (data.slot == userSlot) {
+          setOkbutt(true);
+        }},1000);
       }
       if (data.status == "round") {
-        setOurAths(0);
-        setOppoAths(0);
-        setRoundThurumpu(null);
-        setSlot2CardsRef(0);
-        setSlot3CardsRef(0);
-        setSlot4CardsRef(0);
+        resetGame();
         if (data.winner == userSlot % 2) {
           setOurPoints(data.a);
           setOppoPoints(data.b);
@@ -145,12 +156,7 @@ export default function Game() {
         }
       }
       if (data.status == "seporu") {
-        setOurAths(0);
-        setOppoAths(0);
-        setRoundThurumpu(null);
-        setSlot2CardsRef(0);
-        setSlot3CardsRef(0);
-        setSlot4CardsRef(0);
+        resetGame();
       }
     });
     socket.on("slot_cards", (data) => {
@@ -164,10 +170,10 @@ export default function Game() {
       }
     });
     socket.on("player_place_card", (data) => {
-      console.log(data);
       var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
       var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
       var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
+      console.log(data);
       if (data.slot == s2) {
         setSlot2img(cardsimg["" + data.type + data.value]);
         setSlot2CardsRef(slot2CardsRef.current - 1);
@@ -196,11 +202,11 @@ export default function Game() {
           <div className="flex gap-1">
             <div className="flex flex-col items-center">
               <h1 className="text-sm">Your Team</h1>
-              <h1 className="text-xl font-bold">{ourAths}</h1>
+              <h1 className="text-xl font-bold">{ourPoints}</h1>
             </div>
             <div className="flex flex-col items-center">
               <h1 className="text-sm">Opponent</h1>
-              <h1 className="text-xl font-bold">{oppoAths}</h1>
+              <h1 className="text-xl font-bold">{oppoPoints}</h1>
             </div>
           </div>
           <div className="w-10">
@@ -209,16 +215,13 @@ export default function Game() {
             )}
           </div>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-center">
           <OtherCardHolder
             place={1}
             no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
             cards={slot3Cards}
             styles={"flex h-[60px] lg:h-[100px]"}
           />
-          <h1>
-            {ourPoints}:{oppoPoints}
-          </h1>
         </div>
       </div>
 
@@ -256,6 +259,7 @@ export default function Game() {
           styles={"flex flex-col w-[60px] lg:w-[100px] items-end"}
         />
       </div>
+      <Closedcards our={ourAths} oppo={oppoAths} />
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">
         {okbutt && (
           <input
@@ -267,11 +271,11 @@ export default function Game() {
         )}
         <div className="flex w-full  overflow-hidden justify-center">
           {myCards.map((card, index) => {
-            var size= myCards.length;
+            var size = myCards.length;
             return (
               <Card
                 key={card.type + card.value}
-                style={(size-1==index)?"lastcard":"card"}
+                style={size - 1 == index ? "lastcard" : "card"}
                 selectS={select}
                 card={card}
               />

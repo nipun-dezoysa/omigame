@@ -491,8 +491,8 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
           );
         } else {
           //subround win
-          io.to(roomid).emit("result", { status: "sub", winner, a, b });
-          io.in(roomid).emit("throw_card", slot);
+          io.to(roomid).emit("result", { status: "sub", winner, a, b,slot });
+          // io.in(roomid).emit("throw_card", slot);
         }
       }
     }
