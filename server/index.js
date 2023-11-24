@@ -442,13 +442,18 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
                   (errss, rowss) => {
                     if (!errss) {
                       var points = 0;
+                      var winType = 1;
                       if (winner == rows.thowner % 2) {
                         points = 1;
                         if (rowss) {
-                          if (rowss.winner == 3) points = 2;
+                          if (rowss.winner == 3) {
+                            points = 2;
+                            winType = 3;
+                          }
                         }
                       } else {
                         points = 2;
+                        winType = 2;
                       }
                       db.get(
                         "SELECT * FROM game WHERE gameid=?",
@@ -478,6 +483,8 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
                               winner,
                               a: marks,
                               b: other,
+                              winType,
+                              points
                             });
                             game(rows.gameid, roomid);
                           }
@@ -491,7 +498,7 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
           );
         } else {
           //subround win
-          io.to(roomid).emit("result", { status: "sub", winner, a, b,slot });
+          io.to(roomid).emit("result", { status: "sub", winner, a, b, slot });
           // io.in(roomid).emit("throw_card", slot);
         }
       }

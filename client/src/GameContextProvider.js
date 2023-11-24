@@ -6,9 +6,9 @@ export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
   const [roomid, setRoomid] = useState(null);
   const [gameStatus, setGameStatus] = useState({ status: "outside" });
-  const [thOwner, setThOwner] = useState(0);
+  
   const [roundid, setRoundid] = useState("");
-  const [roundThurumpu, setRoundThurumpu] = useState(null);
+  
 
   const [slot1, setSlot1] = useState(null);
   const [slot2, setSlot2] = useState(null);
@@ -55,22 +55,8 @@ export function GameContextProvider({ children }) {
     socket.emit("game_start", { roomid });
   };
 
-  const thurumpu = (thurumpu) => {
-    socket.emit("thurumpu", {
-      thurumpu,
-      roundid,
-      roomid,
-      slot: userslotRef.current,
-    });
-    setRoundThurumpu(thurumpu);
-  };
-
   useEffect(() => {
-    socket.on("throw_card", (data) => {
-      if (data == userslotRef.current) {
-        setOkbutt(true);
-      }
-    });
+    
     socket.on("room", (data) => {
       setRoomid(data);
     });
@@ -83,15 +69,10 @@ export function GameContextProvider({ children }) {
 
     socket.on("game_status", (data) => {
       setGameStatus(data);
-      if (data.status == "thowner") {
-        setThOwner(data.slot);
-        if (data.slot == userslotRef.current) setOkbutt(true);
-      }
       if (data.status == "roundstart") {
         setRoundid(data.roundid);
         setcardRef([]);
       }
-      if (data.status == "thurumpu") setRoundThurumpu(data.thurumpu);
       //round start weddi okkoma var tika reset karanna oni
     });
     socket.on("slot_pull", ({ status, slot, name }) => {
@@ -167,15 +148,12 @@ export function GameContextProvider({ children }) {
         gameStart,
         myCards,
         gameStatus,
-        thurumpu,
         slotCards,
         setMyCards,
         okbutt,
         setOkbutt,
         socket,
         roundid,
-        roundThurumpu,
-        setRoundThurumpu,
       }}
     >
       {children}

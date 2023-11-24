@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import { motion } from "framer-motion";
-
+import { FaCircleUser } from "react-icons/fa6";
 export default function OtherCardHolder({ no, styles,cards,place }) {
   var full = "half_back.png";
   var side = "half_back_side.png";
@@ -14,13 +14,10 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
   }
   const [name, setName] = useState("Player");
   const [cardsCount, setCardsCount] = useState([]);
-  const {
-    slot1,
-    slot2,
-    slot3,
-    slot4,
-  } = useContext(GameContext);
-
+  const { slot1, slot2, slot3, slot4, socket } = useContext(GameContext);
+const [namestyle, setNamestyle] = useState(
+  "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
+);
   useEffect(() => {
     switch (no) {
       case 1:
@@ -44,9 +41,27 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
     setCardsCount(b);
     console.log(cards);
   }, [cards]);
+  useEffect(()=>{
+    socket.on("throw_card", (data) => {
+      if (data == no) {
+        setNamestyle(
+          "min-w-[60px] flex gap-1 justify-center items-center m-1 text-yellow-500"
+        );
+      }else{
+        setNamestyle(
+          "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
+        );
+      }
+    });
+  },[socket]);
   return (
     <div className={styles}>
-      <div className="text-sm min-w-[60px]">{name}</div>
+      <div className={namestyle}>
+        <div className="text-md">
+          <FaCircleUser />
+        </div>
+        <div className="text-sm  text-center font-bold">{name}</div>
+      </div>
       {[...cardsCount].map((card, index) => (
         <motion.div layout>
           <img

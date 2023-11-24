@@ -2,59 +2,23 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { GameContext } from "../GameContextProvider";
 import OtherCardHolder from "./OtherCardHolder";
 import Card from "./Card";
+import { motion } from "framer-motion";
 import Closedcards from "./Closedcards";
 import Pausescreen from "./Pausescreen";
-const cardsimg = {
-  h7: "7_of_hearts.png",
-  h8: "8_of_hearts.png",
-  h9: "9_of_hearts.png",
-  h10: "10_of_hearts.png",
-  h11: "jack_of_hearts.png",
-  h12: "queen_of_hearts.png",
-  h13: "king_of_hearts.png",
-  h14: "ace_of_hearts.png",
-  c7: "7_of_clubs.png",
-  c8: "8_of_clubs.png",
-  c9: "9_of_clubs.png",
-  c10: "10_of_clubs.png",
-  c11: "jack_of_clubs.png",
-  c12: "queen_of_clubs.png",
-  c13: "king_of_clubs.png",
-  c14: "ace_of_clubs.png",
-  d7: "7_of_diamonds.png",
-  d8: "8_of_diamonds.png",
-  d9: "9_of_diamonds.png",
-  d10: "10_of_diamonds.png",
-  d11: "jack_of_diamonds.png",
-  d12: "queen_of_diamonds.png",
-  d13: "king_of_diamonds.png",
-  d14: "ace_of_diamonds.png",
-  s7: "7_of_spades.png",
-  s8: "8_of_spades.png",
-  s9: "9_of_spades.png",
-  s10: "10_of_spades.png",
-  s11: "jack_of_spades.png",
-  s12: "queen_of_spades.png",
-  s13: "king_of_spades.png",
-  s14: "ace_of_spades.png",
-};
+import { cardsimg } from "../cards/cardlist";
 export default function Game() {
-  const a = [1, 2, 3, 4, 5, 6];
   const {
     socket,
     myCards,
     setMyCards,
     gameStatus,
     userSlot,
-    thurumpu,
     okbutt,
     setOkbutt,
     roomid,
     roundid,
-    roundThurumpu,
-    setRoundThurumpu,
   } = useContext(GameContext);
-  const [selectedCard, setSelectedCard] = useState("");
+  const [selectedCard, setSelectedCard] = useState({type:"k",value:1});
   const [userThrow, setUserThrow] = useState(null);
 
   const [slot2Cards, setSlot2Cards] = useState(0);
@@ -86,13 +50,31 @@ export default function Game() {
   const [ourPoints, setOurPoints] = useState(0);
   const [oppoPoints, setOppoPoints] = useState(0);
 
+  const [pause, setPause] = useState(true);
+  const [ptitle, setPtitle] = useState("");
+  const [pmsg, setPmsg] = useState("Loading...");
+
+  const [resultd, setResultd] = useState(false);
+  const [rtitle, setRtitle] = useState("");
+  const [rmsg, setRmsg] = useState("");
+
+  const [thOwner, setThOwner] = useState(0);
+  const [roundThurumpu, setRoundThurumpu] = useState(null);
+
   const select = (data) => {
     setSelectedCard(data);
   };
   const ok = () => {
-    if (selectedCard != "") {
+    if (selectedCard.type != "k") {
       if (gameStatus.status == "thowner") {
-        thurumpu(selectedCard.type);
+        socket.emit("thurumpu", {
+          thurumpu: selectedCard.type,
+          roundid,
+          roomid,
+          slot: userSlot,
+        });
+        setPause(false);
+        setRoundThurumpu(selectedCard.type);
       } else {
         var a = myCards.filter(
           (card) =>
@@ -110,53 +92,104 @@ export default function Game() {
         });
       }
       setOkbutt(false);
-      setSelectedCard("");
+      setSelectedCard({ type: "k", value: 1 });
     }
   };
 
-  function setSlotsEmpty(){
+  function setSlotsEmpty() {
     setSlot2img(null);
     setSlot3img(null);
     setSlot4img(null);
     setUserThrow(null);
   }
-function resetGame(){
-  setSlotsEmpty();
-  setOurAths(0);
-  setOppoAths(0);
-  setRoundThurumpu(null);
-  setSlot2CardsRef(0);
-  setSlot3CardsRef(0);
-  setSlot4CardsRef(0);
-}
+  function resetGame() {
+    setSlotsEmpty();
+    setOurAths(0);
+    setOppoAths(0);
+    setRoundThurumpu(null);
+    setSlot2CardsRef(0);
+    setSlot3CardsRef(0);
+    setSlot4CardsRef(0);
+  }
   useEffect(() => {
-    socket.on("result", (data) => {
-      
-      if (data.status == "sub") {
-        setTimeout(()=>{setSlotsEmpty();
-        if (data.winner == userSlot % 2) {
-          setOurAths(data.a);
-          setOppoAths(data.b);
-        } else {
-          setOurAths(data.b);
-          setOppoAths(data.a);
-        }
+    socket.on("throw_card", (data) => {
+      if (data == userSlot) {
+        setOkbutt(true);
+      }
+    });
+    socket.on("game_status", (data) => {
+      if (data.status == "thowner") {
+        setPmsg("");
+        setThOwner(data.slot);
         if (data.slot == userSlot) {
           setOkbutt(true);
-        }},1000);
+          setPtitle("Select trump card");
+        } else {
+          setPtitle("wait a second");
+        }
+        setPause(true);
+      }
+      if (data.status == "thurumpu") {
+        setRoundThurumpu(data.thurumpu);
+        setPause(false);
+      }
+      //round start weddi okkoma var tika reset karanna oni
+    });
+    socket.on("result", (data) => {
+      if (data.status == "sub") {
+        setTimeout(() => {
+          setSlotsEmpty();
+          if (data.winner == userSlot % 2) {
+            setOurAths(data.a);
+            setOppoAths(data.b);
+          } else {
+            setOurAths(data.b);
+            setOppoAths(data.a);
+          }
+          if (data.slot == userSlot) {
+            setOkbutt(true);
+          }
+        }, 1000);
       }
       if (data.status == "round") {
-        resetGame();
-        if (data.winner == userSlot % 2) {
-          setOurPoints(data.a);
-          setOppoPoints(data.b);
-        } else {
-          setOurPoints(data.b);
-          setOppoPoints(data.a);
-        }
+        setTimeout(() => {
+          resetGame();
+          if (data.winner == userSlot % 2) {
+            setOurPoints(data.a);
+            setOppoPoints(data.b);
+            setRtitle("Round Win");
+            if(data.winType==1){
+              setRmsg("api thurumpu kiwwe");
+            }else if(data.winType==2){
+              setRmsg("eyala thurumpu kiwwe");
+            }
+          } else {
+            setOurPoints(data.b);
+            setOppoPoints(data.a);
+            setRtitle("Round lose");
+            if (data.winType == 1) {
+              setRmsg("eyala thurumpu kiwwe");
+            } else if (data.winType == 2) {
+              setRmsg("api thurumpu kiwwe");
+            }
+          }
+          if (data.winType == 3) {
+            setRmsg("kalin atha seporuyi");
+          }
+          setResultd(true);
+          setTimeout(()=>{setResultd(false);},3000);
+        }, 1000);
       }
       if (data.status == "seporu") {
-        resetGame();
+        setTimeout(() => {
+          resetGame();
+          setRtitle("Round Draw");
+          setRmsg("");
+          setResultd(true);
+          setTimeout(() => {
+            setResultd(false);
+          }, 3000);
+        }, 1000);
       }
     });
     socket.on("slot_cards", (data) => {
@@ -192,7 +225,6 @@ function resetGame(){
   return (
     //playerslot = userslot - 4 -slot
     <div className="h-[100vh] w-full flex flex-col justify-between">
-      {/* <Pausescreen/> */}
       <div>
         <div className="flex bg-slate-300 justify-between items-center p-1">
           <div>
@@ -230,7 +262,7 @@ function resetGame(){
           place={2}
           no={userSlot + 3 > 4 ? userSlot - 1 : userSlot + 3}
           cards={slot4Cards}
-          styles={"flex flex-col w-[60px] lg:w-[100px] flex-col-reverse"}
+          styles={"flex flex-col w-[60px] lg:w-[100px] flex-col-reverse items-start"}
         />
         <div className="flex justify-center items-center gap-2">
           <div className="w-[30%] md:w-[120px] md:h-[175px]">
@@ -261,6 +293,11 @@ function resetGame(){
       </div>
       <Closedcards our={ourAths} oppo={oppoAths} />
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">
+        <div className="absolute top-[-220px] flex flex-col gap-1 h-[150px] justify-center">
+          {resultd&&<Pausescreen title={rtitle} msg={rmsg} />}
+          {pause && <Pausescreen title={ptitle} msg={pmsg} />}
+        </div>
+
         {okbutt && (
           <input
             className="absolute top-[-60px] bg-cyan-900 py-3 px-10 text-white rounded-lg"
@@ -278,6 +315,7 @@ function resetGame(){
                 style={size - 1 == index ? "lastcard" : "card"}
                 selectS={select}
                 card={card}
+                selected={selectedCard}
               />
             );
           })}
