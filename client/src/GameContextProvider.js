@@ -154,6 +154,8 @@ export function GameContextProvider({ children }) {
         setOkbutt,
         socket,
         roundid,
+        mycardRef,
+        setcardRef,
       }}
     >
       {children}

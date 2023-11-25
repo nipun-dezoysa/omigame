@@ -17,8 +17,10 @@ export default function Game() {
     setOkbutt,
     roomid,
     roundid,
+    mycardRef,
+    setcardRef,
   } = useContext(GameContext);
-  const [selectedCard, setSelectedCard] = useState({type:"k",value:1});
+  const [selectedCard, setSelectedCard] = useState({ type: "k", value: 1 });
   const [userThrow, setUserThrow] = useState(null);
 
   const [slot2Cards, setSlot2Cards] = useState(0);
@@ -57,9 +59,38 @@ export default function Game() {
   const [resultd, setResultd] = useState(false);
   const [rtitle, setRtitle] = useState("");
   const [rmsg, setRmsg] = useState("");
+  const [rstyle, setRstyle] = useState("text-green-600");
 
   const [thOwner, setThOwner] = useState(0);
   const [roundThurumpu, setRoundThurumpu] = useState(null);
+
+  const [last, setLast] = useState({ type: "k", value: 0 });
+  const lastRef = useRef(last);
+  const setLastRef = (data) => {
+    lastRef.current = data;
+    setLast(data);
+  };
+
+  var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
+  var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
+  var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
+
+  const [kingType, setKingType] = useState("k");
+  const [subTrump, setSubTrump] = useState("a");
+  const subTrumpRef = useRef(subTrump);
+  const setSubTrumpRef = (data) => {
+    subTrumpRef.current = data;
+    setSubTrump(data);
+  };
+
+  const [tempsub, setTempsub] = useState([]);
+  const tempsubRef = useRef(tempsub);
+  const setTempsubRef = (data)=>{
+    tempsubRef.current = data;
+    setTempsub(data);
+  }
+  const [oursub, setOursub] = useState(null);
+  const [othersub, setOthersub] = useState(null);
 
   const select = (data) => {
     setSelectedCard(data);
@@ -76,20 +107,29 @@ export default function Game() {
         setPause(false);
         setRoundThurumpu(selectedCard.type);
       } else {
-        var a = myCards.filter(
+        setTempsubRef([
+          ...tempsubRef.current,
+          {
+            img: cardsimg["" + selectedCard.type + selectedCard.value],
+            slot: userSlot,
+          },
+        ]);
+        var a = mycardRef.current.filter(
           (card) =>
             !(
               card.type == selectedCard.type && card.value == selectedCard.value
             )
         );
-        setMyCards(a);
+        setcardRef(a);
         setUserThrow(cardsimg[selectedCard.type + selectedCard.value + ""]);
+        setKingType("k");
         socket.emit("place_card", {
           card: selectedCard,
           slot: userSlot,
           roomid,
           roundid,
         });
+        
       }
       setOkbutt(false);
       setSelectedCard({ type: "k", value: 1 });
@@ -111,10 +151,27 @@ export default function Game() {
     setSlot3CardsRef(0);
     setSlot4CardsRef(0);
   }
+
   useEffect(() => {
     socket.on("throw_card", (data) => {
       if (data == userSlot) {
         setOkbutt(true);
+        if (lastRef.current.type == "k") {
+          setKingType("a");
+        } else {
+          var found = false;
+          for (var i = 0; i < mycardRef.current.length; i++) {
+            if (mycardRef.current[i].type == subTrumpRef.current) {
+              found = true;
+              break;
+            }
+          }
+          if (found) {
+            setKingType(subTrumpRef.current);
+          } else {
+            setKingType("a");
+          }
+        }
       }
     });
     socket.on("game_status", (data) => {
@@ -122,10 +179,11 @@ export default function Game() {
         setPmsg("");
         setThOwner(data.slot);
         if (data.slot == userSlot) {
+          setKingType("a");
           setOkbutt(true);
-          setPtitle("Select trump card");
+          setPtitle("තුරුම්පු තෝරන්න");
         } else {
-          setPtitle("wait a second");
+          setPtitle("තුරුම්පු තොරනකන් ඉන්න");
         }
         setPause(true);
       }
@@ -136,66 +194,79 @@ export default function Game() {
       //round start weddi okkoma var tika reset karanna oni
     });
     socket.on("result", (data) => {
+      setLastRef({ type: "k", value: 0 });
       if (data.status == "sub") {
         setTimeout(() => {
           setSlotsEmpty();
+          console.log(tempsubRef.current);
           if (data.winner == userSlot % 2) {
             setOurAths(data.a);
             setOppoAths(data.b);
+            setOursub(tempsubRef.current);
           } else {
             setOurAths(data.b);
             setOppoAths(data.a);
+            setOthersub(tempsubRef.current);
           }
           if (data.slot == userSlot) {
+            setKingType("a");
             setOkbutt(true);
+            
           }
+          setTempsubRef([]);
         }, 1000);
       }
+      
       if (data.status == "round") {
         setTimeout(() => {
           resetGame();
           if (data.winner == userSlot % 2) {
             setOurPoints(data.a);
             setOppoPoints(data.b);
-            setRtitle("Round Win");
-            if(data.winType==1){
-              setRmsg("api thurumpu kiwwe");
-            }else if(data.winType==2){
-              setRmsg("eyala thurumpu kiwwe");
+            setRtitle("අත දිනුම්");
+            setRstyle("text-green-600");
+            if (data.winType == 1) {
+              setRmsg("තුරුම්පු කිව්වේ අපි");
+            } else if (data.winType == 2) {
+              setRmsg("තුරුම්පු කිව්වේ එයාලා");
             }
           } else {
             setOurPoints(data.b);
             setOppoPoints(data.a);
-            setRtitle("Round lose");
+            setRtitle("අත පරාදයි");
+            setRstyle("text-red-600");
             if (data.winType == 1) {
-              setRmsg("eyala thurumpu kiwwe");
+              setRmsg("තුරුම්පු කිව්වේ එයාලා");
             } else if (data.winType == 2) {
-              setRmsg("api thurumpu kiwwe");
+              setRmsg("තුරුම්පු කිව්වේ අපි");
             }
           }
           if (data.winType == 3) {
-            setRmsg("kalin atha seporuyi");
+            setRmsg("කලින් අත සෙපෝරුයි");
           }
           setResultd(true);
-          setTimeout(()=>{setResultd(false);},3000);
-        }, 1000);
-      }
-      if (data.status == "seporu") {
-        setTimeout(() => {
-          resetGame();
-          setRtitle("Round Draw");
-          setRmsg("");
-          setResultd(true);
+          setTempsubRef([]);
           setTimeout(() => {
             setResultd(false);
           }, 3000);
         }, 1000);
       }
+      if (data.status == "seporu") {
+        setTimeout(() => {
+          resetGame();
+          setRtitle("අත සෙපෝරුයි");
+          setRstyle("text-yellow-600");
+          setRmsg("");
+          setResultd(true);
+          setTempsubRef([]);
+          setTimeout(() => {
+            setResultd(false);
+          }, 3000);
+        }, 1000);
+      }
+      
     });
     socket.on("slot_cards", (data) => {
-      var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
-      var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
-      var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
       for (var i = 0; i < data.length; i++) {
         if (data[i].slot == s2) setSlot2CardsRef(data[i].count);
         if (data[i].slot == s3) setSlot3CardsRef(data[i].count);
@@ -203,21 +274,31 @@ export default function Game() {
       }
     });
     socket.on("player_place_card", (data) => {
-      var s2 = userSlot + 1 < 5 ? userSlot + 1 : userSlot - 3;
-      var s3 = userSlot + 2 < 5 ? userSlot + 2 : userSlot - 2;
-      var s4 = userSlot + 3 < 5 ? userSlot + 3 : userSlot - 1;
-      console.log(data);
-      if (data.slot == s2) {
-        setSlot2img(cardsimg["" + data.type + data.value]);
-        setSlot2CardsRef(slot2CardsRef.current - 1);
-      }
-      if (data.slot == s3) {
-        setSlot3img(cardsimg["" + data.type + data.value]);
-        setSlot3CardsRef(slot3CardsRef.current - 1);
-      }
-      if (data.slot == s4) {
-        setSlot4img(cardsimg["" + data.type + data.value]);
-        setSlot4CardsRef(slot4CardsRef.current - 1);
+      if (
+        lastRef.current.type != data.type ||
+        lastRef.current.value != data.value
+      ) {
+        setTempsubRef([
+          ...tempsubRef.current,
+          { img: cardsimg["" + data.type + data.value] ,slot:data.slot},
+        ]);
+       
+        if (lastRef.current.type == "k") {
+          setSubTrumpRef(data.type);
+        }
+        setLastRef({ type: data.type, value: data.value });
+        if (data.slot == s2) {
+          setSlot2img(cardsimg["" + data.type + data.value]);
+          setSlot2CardsRef(slot2CardsRef.current - 1);
+        }
+        if (data.slot == s3) {
+          setSlot3img(cardsimg["" + data.type + data.value]);
+          setSlot3CardsRef(slot3CardsRef.current - 1);
+        }
+        if (data.slot == s4) {
+          setSlot4img(cardsimg["" + data.type + data.value]);
+          setSlot4CardsRef(slot4CardsRef.current - 1);
+        }
       }
     });
   }, [socket]);
@@ -262,7 +343,9 @@ export default function Game() {
           place={2}
           no={userSlot + 3 > 4 ? userSlot - 1 : userSlot + 3}
           cards={slot4Cards}
-          styles={"flex flex-col w-[60px] lg:w-[100px] flex-col-reverse items-start"}
+          styles={
+            "flex flex-col w-[60px] lg:w-[100px] flex-col-reverse items-start"
+          }
         />
         <div className="flex justify-center items-center gap-2">
           <div className="w-[30%] md:w-[120px] md:h-[175px]">
@@ -291,16 +374,22 @@ export default function Game() {
           styles={"flex flex-col w-[60px] lg:w-[100px] items-end"}
         />
       </div>
-      <Closedcards our={ourAths} oppo={oppoAths} />
+      <Closedcards our={ourAths} oppo={oppoAths} oursub={oursub} othersub={othersub} />
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">
         <div className="absolute top-[-220px] flex flex-col gap-1 h-[150px] justify-center">
-          {resultd&&<Pausescreen title={rtitle} msg={rmsg} />}
-          {pause && <Pausescreen title={ptitle} msg={pmsg} />}
+          {resultd && <Pausescreen title={rtitle} msg={rmsg} style={rstyle} />}
+          {pause && (
+            <Pausescreen title={ptitle} msg={pmsg} style={"text-yellow-600"} />
+          )}
         </div>
 
         {okbutt && (
           <input
-            className="absolute top-[-60px] bg-cyan-900 py-3 px-10 text-white rounded-lg"
+            className={
+              selectedCard.type != "k"
+                ? "absolute top-[-60px] bg-green-600 py-3 px-10 text-white rounded-lg"
+                : "absolute top-[-60px] bg-green-800 py-3 px-10 text-white rounded-lg"
+            }
             type="button"
             value="OK"
             onClick={ok}
@@ -316,6 +405,7 @@ export default function Game() {
                 selectS={select}
                 card={card}
                 selected={selectedCard}
+                subtrump={kingType}
               />
             );
           })}

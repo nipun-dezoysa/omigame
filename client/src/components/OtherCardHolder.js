@@ -39,7 +39,6 @@ const [namestyle, setNamestyle] = useState(
     var b = [];
     for (var i = 0; i < cards; i++) b.push("a");
     setCardsCount(b);
-    console.log(cards);
   }, [cards]);
   useEffect(()=>{
     socket.on("throw_card", (data) => {
@@ -53,6 +52,21 @@ const [namestyle, setNamestyle] = useState(
         );
       }
     });
+    socket.on("result", (data) => {
+      if (data.status == "sub") {
+        setTimeout(() => {
+          if (data.slot == no) {
+            setNamestyle(
+              "min-w-[60px] flex gap-1 justify-center items-center m-1 text-yellow-500"
+            );
+          } else {
+            setNamestyle(
+              "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
+            );
+          }
+        }, 1000);
+      }
+    });
   },[socket]);
   return (
     <div className={styles}>
@@ -60,7 +74,7 @@ const [namestyle, setNamestyle] = useState(
         <div className="text-md">
           <FaCircleUser />
         </div>
-        <div className="text-sm  text-center font-bold">{name}</div>
+        <div className="text-sm  text-center font-bold ">{name}</div>
       </div>
       {[...cardsCount].map((card, index) => (
         <motion.div layout>

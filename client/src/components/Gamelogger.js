@@ -37,7 +37,7 @@ export default function Gamelogger() {
   }
   return (
     <div>
-      {(gameStatus.status=="outside") && (
+      {gameStatus.status == "outside" && (
         <div className="flex flex-col w-96 rounded-lg bg-white mt-10 mx-auto shadow-md overflow-hidden">
           {!roomid && (
             <div>
@@ -62,7 +62,11 @@ export default function Gamelogger() {
                   lable={"Your Name"}
                 />
                 {!iscreate && (
-                  <Inputfield value={id} setValue={setId} lable={"Room ID"} />
+                  <Inputfield
+                    value={id}
+                    setValue={(a) => setId(a.toUpperCase())}
+                    lable={"Room ID"}
+                  />
                 )}
                 <Button
                   text={iscreate ? "Create Room" : "Join Room"}

@@ -415,13 +415,13 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
           else b = row[i].num;
         }
         //4
-        if (a > 2 || (a == 2 && b == 2)) {
+        if (a > 1 || (a == 1 && b == 1)) {
           db.get(
             "SELECT * FROM round WHERE roundid=?",
             [roundid],
             (errs, rows) => {
               //4
-              if (a == 2) {
+              if (a == 1) {
                 //seporu
                 db.run("UPDATE round SET winner=? WHERE roundid=?", [
                   3,
@@ -473,9 +473,16 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
                           }
                           db.run(sql, [marks, rows.gameid]);
                           //10
-                          if (marks >= 3) {
+                          if (marks >= 2) {
                             //win full game
                             console.log("won the full game");
+                            io.to(roomid).emit("result", {
+                              status: "game",
+                              winner,
+                              a: marks,
+                              b: other,
+                              winType,
+                            });
                           } else {
                             //win round
                             io.to(roomid).emit("result", {
@@ -484,7 +491,6 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
                               a: marks,
                               b: other,
                               winType,
-                              points
                             });
                             game(rows.gameid, roomid);
                           }
