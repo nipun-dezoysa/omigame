@@ -1,14 +1,13 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { BiLogIn } from "react-icons/bi";
 import io from "socket.io-client";
-const socket = io.connect("http://192.168.215.45:3001");
+const socket = io.connect("http://localhost:3001");
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
   const [roomid, setRoomid] = useState(null);
   const [gameStatus, setGameStatus] = useState({ status: "outside" });
-  
+
   const [roundid, setRoundid] = useState("");
-  
 
   const [slot1, setSlot1] = useState(null);
   const [slot2, setSlot2] = useState(null);
@@ -56,7 +55,6 @@ export function GameContextProvider({ children }) {
   };
 
   useEffect(() => {
-    
     socket.on("room", (data) => {
       setRoomid(data);
     });
@@ -148,6 +146,7 @@ export function GameContextProvider({ children }) {
         gameStart,
         myCards,
         gameStatus,
+        setGameStatus,
         slotCards,
         setMyCards,
         okbutt,

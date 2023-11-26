@@ -6,7 +6,13 @@ import { motion } from "framer-motion";
 import Closedcards from "./Closedcards";
 import Pausescreen from "./Pausescreen";
 import { cardsimg } from "../cards/cardlist";
+import {
+  useWindowSize,
+} from "@react-hook/window-size";
+import Confetti from "react-confetti";
 export default function Game() {
+  const  [width, height] = useWindowSize();
+  const[party,setParty] = useState(false);
   const {
     socket,
     myCards,
@@ -19,6 +25,7 @@ export default function Game() {
     roundid,
     mycardRef,
     setcardRef,
+    setGameStatus,
   } = useContext(GameContext);
   const [selectedCard, setSelectedCard] = useState({ type: "k", value: 1 });
   const [userThrow, setUserThrow] = useState(null);
@@ -85,10 +92,10 @@ export default function Game() {
 
   const [tempsub, setTempsub] = useState([]);
   const tempsubRef = useRef(tempsub);
-  const setTempsubRef = (data)=>{
+  const setTempsubRef = (data) => {
     tempsubRef.current = data;
     setTempsub(data);
-  }
+  };
   const [oursub, setOursub] = useState(null);
   const [othersub, setOthersub] = useState(null);
 
@@ -129,7 +136,6 @@ export default function Game() {
           roomid,
           roundid,
         });
-        
       }
       setOkbutt(false);
       setSelectedCard({ type: "k", value: 1 });
@@ -211,12 +217,11 @@ export default function Game() {
           if (data.slot == userSlot) {
             setKingType("a");
             setOkbutt(true);
-            
           }
           setTempsubRef([]);
         }, 1000);
       }
-      
+
       if (data.status == "round") {
         setTimeout(() => {
           resetGame();
@@ -264,7 +269,27 @@ export default function Game() {
           }, 3000);
         }, 1000);
       }
-      
+
+      if (data.status == "game") {
+        if (data.winner == userSlot % 2) {
+          setParty(true);
+          setOurPoints(data.a);
+          setOppoPoints(data.b);
+          setRtitle("අපි දිනුම්");
+          setRstyle("text-green-600");
+          setRmsg(data.a + " : " + data.b);
+        } else {
+          setOurPoints(data.b);
+          setOppoPoints(data.a);
+          setRtitle("අපි පරාදයි");
+          setRstyle("text-red-600");
+         setRmsg(data.b + " : " + data.a);
+        }
+        setResultd(true);
+        setTimeout(() => {
+          setGameStatus({ status: "outside" });
+        }, 6000);
+      }
     });
     socket.on("slot_cards", (data) => {
       for (var i = 0; i < data.length; i++) {
@@ -280,9 +305,9 @@ export default function Game() {
       ) {
         setTempsubRef([
           ...tempsubRef.current,
-          { img: cardsimg["" + data.type + data.value] ,slot:data.slot},
+          { img: cardsimg["" + data.type + data.value], slot: data.slot },
         ]);
-       
+
         if (lastRef.current.type == "k") {
           setSubTrumpRef(data.type);
         }
@@ -306,6 +331,7 @@ export default function Game() {
   return (
     //playerslot = userslot - 4 -slot
     <div className="h-[100vh] w-full flex flex-col justify-between">
+     {party&& <Confetti width={width} height={height} />}
       <div>
         <div className="flex bg-slate-300 justify-between items-center p-1">
           <div>
@@ -374,7 +400,12 @@ export default function Game() {
           styles={"flex flex-col w-[60px] lg:w-[100px] items-end"}
         />
       </div>
-      <Closedcards our={ourAths} oppo={oppoAths} oursub={oursub} othersub={othersub} />
+      <Closedcards
+        our={ourAths}
+        oppo={oppoAths}
+        oursub={oursub}
+        othersub={othersub}
+      />
       <div className="flex gap-2 w-full h-[175px] justify-center relative flex-nowrap">
         <div className="absolute top-[-220px] flex flex-col gap-1 h-[150px] justify-center">
           {resultd && <Pausescreen title={rtitle} msg={rmsg} style={rstyle} />}
