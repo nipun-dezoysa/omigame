@@ -2,7 +2,6 @@ import Inputfield from "./Inputfield";
 import Button from "./Button";
 import Playerslot from "./Playerslot";
 import { useState, useContext } from "react";
-import { BiArrowBack } from "react-icons/bi";
 import { GameContext } from "../GameContextProvider";
 import Game from "./Game";
 export default function Gamelogger() {
@@ -36,9 +35,9 @@ export default function Gamelogger() {
     }
   }
   return (
-    <div>
+    <div className="h-full flex flex-col justify-between">
       {gameStatus.status == "outside" && (
-        <div className="flex flex-col w-96 rounded-lg bg-white mt-10 mx-auto shadow-md overflow-hidden">
+        <div className="flex flex-col w-96 rounded-lg bg-white mx-auto shadow-md overflow-hidden">
           {!roomid && (
             <div>
               <div className="flex justify-between ">
@@ -90,13 +89,15 @@ export default function Gamelogger() {
                 />
               </div>
               <div className="flex justify-evenly items-center">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col items-center gap-1">
                   <Playerslot slotno={1} slot={slot1} setSlot={setSlot1} />
+                  <div>Team 1</div>
                   <Playerslot slotno={3} slot={slot3} setSlot={setSlot3} />
                 </div>
                 <div>VS</div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col items-center gap-1">
                   <Playerslot slotno={2} slot={slot2} setSlot={setSlot2} />
+                  <div>Team 2</div>
                   <Playerslot slotno={4} slot={slot4} setSlot={setSlot4} />
                 </div>
               </div>
@@ -106,6 +107,8 @@ export default function Gamelogger() {
         </div>
       )}
       {gameStatus.status != "outside" && <Game />}
+
+      
     </div>
   );
 }

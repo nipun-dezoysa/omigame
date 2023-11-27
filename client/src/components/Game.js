@@ -330,27 +330,27 @@ export default function Game() {
 
   return (
     //playerslot = userslot - 4 -slot
-    <div className="h-[100vh] w-full flex flex-col justify-between">
+    <div className="h-full w-full flex flex-col justify-between">
      {party&& <Confetti width={width} height={height} />}
       <div>
-        <div className="flex bg-slate-300 justify-between items-center p-1">
+        <div className="flex bg-slate-300 justify-between items-center py-1 px-2">
           <div>
-            <h1 className="text-sm">Room ID</h1>
-            <h1 className="text-xl font-bold">{roomid}</h1>
+            <div className="text-sm">Room ID</div>
+            <div className="text-lg font-bold">{roomid}</div>
           </div>
           <div className="flex gap-1">
             <div className="flex flex-col items-center">
-              <h1 className="text-sm">Your Team</h1>
-              <h1 className="text-xl font-bold">{ourPoints}</h1>
+              <div className="text-sm">Your Team</div>
+              <div className="text-xl font-bold">{ourPoints}</div>
             </div>
             <div className="flex flex-col items-center">
-              <h1 className="text-sm">Opponent</h1>
-              <h1 className="text-xl font-bold">{oppoPoints}</h1>
+              <div className="text-sm">Opponent</div>
+              <div className="text-xl font-bold">{oppoPoints}</div>
             </div>
           </div>
-          <div className="w-10">
+          <div className="w-7">
             {roundThurumpu && (
-              <img src={require(`./../cards/${roundThurumpu}.png`)} alt="" />
+              <img className="w-full" src={require(`./../cards/${roundThurumpu}.png`)} alt="" />
             )}
           </div>
         </div>
@@ -426,7 +426,7 @@ export default function Game() {
             onClick={ok}
           />
         )}
-        <div className="flex w-full  overflow-hidden justify-center">
+        <div className="flex w-full overflow-hidden justify-center">
           {myCards.map((card, index) => {
             var size = myCards.length;
             return (
