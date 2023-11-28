@@ -54,6 +54,15 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("user: " + socket.id);
+  socket.on("roomdetails", (data) => {
+    db.get("SELECT * FROM room WHERE roomid=?", [data.roomid], (err, row) => {
+      if (row) {
+        socket.emit("roomdet", { status: true });
+      } else {
+        socket.emit("roomdet", { status: false });
+      }
+    });
+  });
   socket.on("create_room", (data) => {
     var roomid = randomstring
       .generate({
@@ -76,33 +85,42 @@ io.on("connection", (socket) => {
           db.run(sql, [0, roomid, "", ""]);
           socket.emit("admin", true);
           socket.emit("room", roomid);
+          socket.emit("logged", { status: true, roomid });
         }
       }
     );
   });
   socket.on("join_room", (data) => {
-    db.get(
-      "SELECT * FROM player where roomid=? AND playerno=0 AND name=''",
-      [data.room],
-      (err, row) => {
-        if (row) {
-          var sql = "UPDATE player SET name=? , socket=? WHERE playerid=?";
-          db.run(sql, [data.name, socket.id, row.playerid]);
-          socket.join(data.room);
-          db.all(
-            "SELECT playerno,name,socket FROM player WHERE socket!=? AND roomid=?",
-            [socket.id, data.room],
-            (eror, rowss) => {
-              socket.emit("slots", rowss);
-              socket.emit("room", data.room);
+    console.log("aaaa");
+    db.get("SELECT * FROM room WHERE roomid=?", [data.room], (ers, rws) => {
+      if (rws) {
+        db.get(
+          "SELECT * FROM player where roomid=? AND playerno=0 AND name=''",
+          [data.room],
+          (err, row) => {
+            if (row) {
+              var sql = "UPDATE player SET name=? , socket=? WHERE playerid=?";
+              db.run(sql, [data.name, socket.id, row.playerid]);
+              socket.join(data.room);
+              db.all(
+                "SELECT playerno,name,socket FROM player WHERE socket!=? AND roomid=?",
+                [socket.id, data.room],
+                (eror, rowss) => {
+                  socket.emit("slots", rowss);
+                  socket.emit("room", data.room);
+                  socket.emit("logged", { status: true, roomid: data.room });
+                }
+              );
+            } else {
+              socket.emit("logged", { status: false, type: 2 });
+              console.log("no", data.room);
             }
-          );
-        } else {
-          socket.emit("error", "Room is full");
-          console.log("no");
-        }
+          }
+        );
+      }else{
+        socket.emit("logged", { status: false, type:1 });
       }
-    );
+    });
   });
 
   socket.on("slot_push", ({ status, slot, roomid, name }) => {
@@ -271,21 +289,53 @@ io.on("connection", (socket) => {
       }
     );
   });
-
+  socket.on("userrest", () => {
+    userReset(socket);
+  });
   socket.on("disconnecting", () => {
-    db.get("SELECT * FROM player WHERE socket=?", [socket.id], (err, row) => {
-      if (row) {
-        socket
-          .to(row.roomid)
-          .emit("slot_pull", { status: 0, slot: row.playerno, name: row.name });
-      }
-    });
-    var sql =
-      "UPDATE player SET playerno=0 , name='', socket='' WHERE socket=?";
-    db.run(sql, [socket.id]);
+    userReset(socket);
     console.log(socket.id); // the Set contains at least the socket ID
   });
 });
+
+function userReset(socket) {
+  db.get("SELECT * FROM player WHERE socket=?", [socket.id], (err, row) => {
+    if (row) {
+      db.run(
+        "UPDATE player SET playerno=0 , name='', socket='' WHERE socket=?",
+        [socket.id]
+      );
+      socket
+        .to(row.roomid)
+        .emit("slot_pull", { status: 0, slot: row.playerno, name: row.name });
+      db.all(
+        "SELECT * FROM player WHERE roomid=? AND socket!=''",
+        [row.roomid],
+        (error, rows) => {
+          if (rows.length == 0) {
+            db.run("DELETE FROM room WHERE roomid=?", [row.roomid]);
+          } else {
+            db.get(
+              "SELECT admin FROM room WHERE roomid=?",
+              [row.roomid],
+              (rerr, rrow) => {
+                if (rrow) {
+                  if (rrow.admin == socket.id) {
+                    db.run("UPDATE room SET admin=? WHERE roomid=?", [
+                      rows[0].socket,
+                      row.roomid,
+                    ]);
+                    io.to(rows[0].socket).emit("admin", true);
+                  }
+                }
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+}
 
 function sendAtha(roundid, roomid, playerno, atha) {
   // console.log("send atha");

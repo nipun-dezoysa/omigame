@@ -9,7 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout/>}>
           <Route index element={<Main />} />
-          <Route path="/game/:gid" element={<Gamelogger />} />
+          <Route path="/game/:rid" element={<Gamelogger />} />
         </Route>
       </Routes>
     </GameContextProvider>

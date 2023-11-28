@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { BiLogIn } from "react-icons/bi";
 import io from "socket.io-client";
-const socket = io.connect("http://localhost:3001");
+const socket = io.connect("http://192.168.215.45:3001");
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
   const [roomid, setRoomid] = useState(null);
@@ -38,13 +38,14 @@ export function GameContextProvider({ children }) {
     setMyCards(data);
   };
   const [okbutt, setOkbutt] = useState(false);
-
-  const create = (name) => {
-    socket.emit("create_room", { name });
-  };
-  const join = (name, room) => {
-    socket.emit("join_room", { name, room });
-  };
+const resetvalues = ()=>{
+  setSlot1(null);
+  setSlot2(null);
+  setSlot3(null);
+  setSlot4(null);
+  setUserslotRef(0);
+  setGameStatus({ status: "outside" });
+}
   const slotClick = (status, slot) => {
     socket.emit("slot_push", { status, slot, roomid, name });
     setUserslotRef(slot);
@@ -127,8 +128,6 @@ export function GameContextProvider({ children }) {
         setName,
         id,
         setId,
-        create,
-        join,
         roomid,
         setRoomid,
         slot1,
@@ -155,6 +154,7 @@ export function GameContextProvider({ children }) {
         roundid,
         mycardRef,
         setcardRef,
+        resetvalues,
       }}
     >
       {children}
