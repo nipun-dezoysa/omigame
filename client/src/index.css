@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body{
-  @apply bg-slate-200;
+  @apply bg-slate-100;
 }
 .card{
   @apply w-[10%] lg:w-[60px];

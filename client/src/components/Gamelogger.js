@@ -4,6 +4,7 @@ import Playerslot from "./Playerslot";
 import { useState, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import Game from "./Game";
+import { useParams } from "react-router-dom";
 export default function Gamelogger() {
   const {
     name,
@@ -34,8 +35,10 @@ export default function Gamelogger() {
       join(name, id);
     }
   }
+  const {gid} = useParams();
   return (
-    <div className="h-full flex flex-col justify-between">
+    <div className="flex flex-col justify-between h-full">
+      <div>{gid}</div>
       {gameStatus.status == "outside" && (
         <div className="flex flex-col w-96 rounded-lg bg-white mx-auto shadow-md overflow-hidden">
           {!roomid && (

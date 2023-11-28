@@ -330,27 +330,31 @@ export default function Game() {
 
   return (
     //playerslot = userslot - 4 -slot
-    <div className="h-full w-full flex flex-col justify-between">
-     {party&& <Confetti width={width} height={height} />}
-      <div>
-        <div className="flex bg-slate-300 justify-between items-center py-1 px-2">
-          <div>
+    <div className="min-h-[100vh] w-full flex flex-col justify-between">
+      {party && <Confetti width={width} height={height} />}
+      <div className="mb-2">
+        <div className="flex justify-between items-center px-2 bg-slate-200">
+          <div className=" text-slate-400">
             <div className="text-sm">Room ID</div>
             <div className="text-lg font-bold">{roomid}</div>
           </div>
-          <div className="flex gap-1">
-            <div className="flex flex-col items-center">
-              <div className="text-sm">Your Team</div>
-              <div className="text-xl font-bold">{ourPoints}</div>
+          <div className="flex text-white">
+            <div className="flex flex-col items-center bg-gradient-to-r to-blue-500 from-transparent justify-center w-24">
+              <div className="text-sm">Our Team</div>
+              <div className="text-xl font-bold">{ourPoints<10?"0"+ourPoints:ourPoints}</div>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center bg-gradient-to-r from-red-500 justify-center w-24">
               <div className="text-sm">Opponent</div>
-              <div className="text-xl font-bold">{oppoPoints}</div>
+              <div className="text-xl font-bold">{oppoPoints<10?"0"+oppoPoints:oppoPoints}</div>
             </div>
           </div>
           <div className="w-7">
             {roundThurumpu && (
-              <img className="w-full" src={require(`./../cards/${roundThurumpu}.png`)} alt="" />
+              <img
+                className="w-full"
+                src={require(`./../cards/${roundThurumpu}.png`)}
+                alt="trump type"
+              />
             )}
           </div>
         </div>
@@ -359,7 +363,7 @@ export default function Game() {
             place={1}
             no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
             cards={slot3Cards}
-            styles={"flex h-[60px] lg:h-[100px]"}
+            styles={"flex h-[60px] lg:h-[80px]"}
           />
         </div>
       </div>
@@ -370,7 +374,7 @@ export default function Game() {
           no={userSlot + 3 > 4 ? userSlot - 1 : userSlot + 3}
           cards={slot4Cards}
           styles={
-            "flex flex-col w-[60px] lg:w-[100px] flex-col-reverse items-start"
+            "flex flex-col w-[60px] lg:w-[80px] flex-col-reverse items-start"
           }
         />
         <div className="flex justify-center items-center gap-2">
@@ -397,7 +401,7 @@ export default function Game() {
           place={3}
           no={userSlot + 1 > 4 ? userSlot - 3 : userSlot + 1}
           cards={slot2Cards}
-          styles={"flex flex-col w-[60px] lg:w-[100px] items-end"}
+          styles={"flex flex-col w-[60px] lg:w-[80px] items-end"}
         />
       </div>
       <Closedcards
