@@ -341,11 +341,15 @@ export default function Game() {
           <div className="flex text-white">
             <div className="flex flex-col items-center bg-gradient-to-r to-blue-500 from-transparent justify-center w-24">
               <div className="text-sm">Our Team</div>
-              <div className="text-xl font-bold">{ourPoints<10?"0"+ourPoints:ourPoints}</div>
+              <div className="text-xl font-bold">
+                {ourPoints < 10 ? "0" + ourPoints : ourPoints}
+              </div>
             </div>
             <div className="flex flex-col items-center bg-gradient-to-r from-red-500 justify-center w-24">
               <div className="text-sm">Opponent</div>
-              <div className="text-xl font-bold">{oppoPoints<10?"0"+oppoPoints:oppoPoints}</div>
+              <div className="text-xl font-bold">
+                {oppoPoints < 10 ? "0" + oppoPoints : oppoPoints}
+              </div>
             </div>
           </div>
           <div className="w-7">
@@ -364,6 +368,7 @@ export default function Game() {
             no={userSlot + 2 > 4 ? userSlot - 2 : userSlot + 2}
             cards={slot3Cards}
             styles={"flex h-[60px] lg:h-[80px]"}
+            trumpOwner={thOwner}
           />
         </div>
       </div>
@@ -376,6 +381,7 @@ export default function Game() {
           styles={
             "flex flex-col w-[60px] lg:w-[80px] flex-col-reverse items-start"
           }
+          trumpOwner={thOwner}
         />
         <div className="flex justify-center items-center gap-2">
           <div className="w-[30%] md:w-[120px] md:h-[175px]">
@@ -402,6 +408,7 @@ export default function Game() {
           no={userSlot + 1 > 4 ? userSlot - 3 : userSlot + 1}
           cards={slot2Cards}
           styles={"flex flex-col w-[60px] lg:w-[80px] items-end"}
+          trumpOwner={thOwner}
         />
       </div>
       <Closedcards

@@ -4,7 +4,7 @@ export default function Playerslot({ slotno, slot, setSlot }) {
   const [count, setCount] = useState(false);
   const { name, userSlot, setUserSlot, slotClick } = useContext(GameContext);
   const [style, setStyle] = useState(
-    "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer"
+    "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer animate-pulse"
   );
   const[owner,setOwner]=useState("");
   const [lable, setLable] = useState("Player");
@@ -22,7 +22,7 @@ export default function Playerslot({ slotno, slot, setSlot }) {
       slotClick(0, slotno);
       setSlot(null);
       setStyle(
-        "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer"
+        "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer animate-pulse"
       );
       setUserSlot(0);
     }
@@ -38,7 +38,7 @@ export default function Playerslot({ slotno, slot, setSlot }) {
     } else {
       setLable("Player " + slotno);
       setStyle(
-        "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer"
+        "flex flex-col items-center justify-center border border-slate-500 rounded-md text-slate-500 w-24 h-24 hover:bg-cyan-200 cursor-pointer animate-pulse"
       );
       setOwner("");
     }

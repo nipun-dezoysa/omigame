@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function Layout() {
   return (
     <div className="flex flex-col min-h-[100vh]">
-      <div className="bg-white ">
+      <div className="bg-white shadow-sm">
         <div class="sticky w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
           <Link to="/">
             <h1 className="text-xl font-semibold text-black">
@@ -16,7 +16,7 @@ export default function Layout() {
         </div>
       </div>
       <Outlet />
-      <footer class="bg-white mt-1  dark:bg-gray-800 mt-auto">
+      <footer class="bg-white dark:bg-gray-800 mt-auto">
         <div class="w-full mx-auto max-w-screen-xl p-2 px-4 md:p-4 md:flex md:items-center md:justify-between">
           <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">
             © 2023{" "}

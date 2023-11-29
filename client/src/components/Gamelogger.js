@@ -6,6 +6,11 @@ import { GameContext } from "../GameContextProvider";
 import Game from "./Game";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { MdErrorOutline } from "react-icons/md";
+import { Link } from "react-router-dom";
+import { IoMdLink } from "react-icons/io";
+import copy from "copy-to-clipboard";
+import { ToastContainer, toast } from "react-toastify";
 export default function Gamelogger() {
   const navigate = useNavigate();
   const {
@@ -28,11 +33,12 @@ export default function Gamelogger() {
     socket,
     resetvalues,
   } = useContext(GameContext);
-  const [iscreate, setIscreate] = useState(false);
+  const [btnwait, setbtnwait] = useState(false);
   const [roomVerify, SetroomVerify] = useState(false);
   const { rid } = useParams();
   const join = () => {
     resetvalues();
+    setbtnwait(true);
     socket.emit("join_room", { name, room: rid });
   };
   useEffect(() => {
@@ -47,18 +53,75 @@ export default function Gamelogger() {
     socket.on("roomdet", (data) => {
       SetroomVerify(data.status);
     });
+    socket.on("logged", (data) => {
+      if (data.status) {
+        //do something mchn
+      } else {
+        setbtnwait(false);
+        if (data.type == 1) {
+          toast.error("Room is not available", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          toast.warn("Room is Full", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
+      }
+    });
   }, [socket]);
   return (
     <div className="flex flex-col justify-between h-full">
+      <ToastContainer />
       {gameStatus.status == "outside" && (
         <div className="mt-20 flex flex-col w-[90%] md:w-96 rounded-lg bg-white mx-auto shadow-md overflow-hidden">
-          {!roomVerify && <div>There is no room</div>}
+          {!roomVerify && (
+            <div className="px-4 py-5 flex items-center gap-2">
+              <MdErrorOutline />
+              There is no room
+              <Link className="text-blue-600 underline" to="/">
+                return to home page
+              </Link>
+            </div>
+          )}
           {roomVerify && (
             <div className="px-4 py-5 flex flex-col gap-2">
               <div className="flex justify-between">
                 <div>
                   <div className="text-sm">Room ID</div>
-                  <div className="text-2xl">{rid}</div>
+                  <div className="text-2xl flex items-center gap-1">
+                    {rid}
+                    <IoMdLink
+                      className="text-gray-400 cursor-pointer"
+                      onClick={() => {
+                        copy("http://localhost:3000/game/" + rid);
+                        toast.info("Copied", {
+                          position: "top-center",
+                          autoClose: 5000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: true,
+                          draggable: true,
+                          progress: undefined,
+                          theme: "light",
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
                 <input
                   type="button"
@@ -74,7 +137,12 @@ export default function Gamelogger() {
                     setValue={setName}
                     lable={"Your Name"}
                   />
-                  <Button text={"Join Room"} onClick={join} />
+                  <Button
+                    text={btnwait ? "Joining Room..." : "Join Room"}
+                    onClick={join}
+                    disabled={name == ""}
+                    waiting={btnwait}
+                  />
                 </>
               )}
               {roomid == rid && (
@@ -92,7 +160,13 @@ export default function Gamelogger() {
                       <Playerslot slotno={4} slot={slot4} setSlot={setSlot4} />
                     </div>
                   </div>
-                  {admin && <Button text={"Start"} onClick={gameStart} />}
+                  {admin && (
+                    <Button
+                      text={"Start"}
+                      onClick={gameStart}
+                      disabled={!slot1 || !slot2 || !slot3 || !slot4}
+                    />
+                  )}
                 </>
               )}
             </div>

@@ -42,7 +42,7 @@ const cards = [
   { type: "d", val: 12 },
   { type: "d", val: 13 },
 ];
-
+var usercount = 0;
 app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -54,6 +54,8 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("user: " + socket.id);
+  usercount++;
+  io.emit("usercount", usercount);
   socket.on("roomdetails", (data) => {
     db.get("SELECT * FROM room WHERE roomid=?", [data.roomid], (err, row) => {
       if (row) {
@@ -95,7 +97,7 @@ io.on("connection", (socket) => {
     db.get("SELECT * FROM room WHERE roomid=?", [data.room], (ers, rws) => {
       if (rws) {
         db.get(
-          "SELECT * FROM player where roomid=? AND playerno=0 AND name=''",
+          "SELECT * FROM player where roomid=? AND name=''",
           [data.room],
           (err, row) => {
             if (row) {
@@ -293,6 +295,8 @@ io.on("connection", (socket) => {
     userReset(socket);
   });
   socket.on("disconnecting", () => {
+    usercount--;
+    io.emit("usercount",usercount);
     userReset(socket);
     console.log(socket.id); // the Set contains at least the socket ID
   });
@@ -465,13 +469,13 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
           else b = row[i].num;
         }
         //4
-        if (a > 1 || (a == 1 && b == 1)) {
+        if (a > 4 || (a == 4 && b == 4)) {
           db.get(
             "SELECT * FROM round WHERE roundid=?",
             [roundid],
             (errs, rows) => {
               //4
-              if (a == 1) {
+              if (a == 4) {
                 //seporu
                 db.run("UPDATE round SET winner=? WHERE roundid=?", [
                   3,

@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { GameContext } from "../GameContextProvider";
 import { motion } from "framer-motion";
 import { FaCircleUser } from "react-icons/fa6";
-export default function OtherCardHolder({ no, styles,cards,place }) {
+import { FaCrown } from "react-icons/fa";
+export default function OtherCardHolder({ no, styles, cards, place,trumpOwner }) {
   var full = "half_back.png";
   var side = "half_back_side.png";
   if (place == 2) {
@@ -15,9 +16,9 @@ export default function OtherCardHolder({ no, styles,cards,place }) {
   const [name, setName] = useState("Player");
   const [cardsCount, setCardsCount] = useState([]);
   const { slot1, slot2, slot3, slot4, socket } = useContext(GameContext);
-const [namestyle, setNamestyle] = useState(
-  "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
-);
+  const [namestyle, setNamestyle] = useState(
+    "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
+  );
   useEffect(() => {
     switch (no) {
       case 1:
@@ -40,17 +41,31 @@ const [namestyle, setNamestyle] = useState(
     for (var i = 0; i < cards; i++) b.push("a");
     setCardsCount(b);
   }, [cards]);
-  useEffect(()=>{
+  useEffect(() => {
     socket.on("throw_card", (data) => {
       if (data == no) {
         setNamestyle(
           "min-w-[60px] flex gap-1 justify-center items-center m-1 text-yellow-500"
         );
-      }else{
+      } else {
         setNamestyle(
           "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
         );
       }
+    });
+    socket.on("game_status", (data) => {
+      if (data.status == "thowner") {
+        if (data.slot == no) {
+          setNamestyle(
+            "min-w-[60px] flex gap-1 justify-center items-center m-1 text-yellow-500"
+          );
+        } else {
+          setNamestyle(
+            "min-w-[60px] flex gap-1 justify-center items-center m-1 text-black"
+          );
+        }
+      }
+      //round start weddi okkoma var tika reset karanna oni
     });
     socket.on("result", (data) => {
       if (data.status == "sub") {
@@ -67,12 +82,12 @@ const [namestyle, setNamestyle] = useState(
         }, 1000);
       }
     });
-  },[socket]);
+  }, [socket]);
   return (
     <div className={styles}>
       <div className={namestyle}>
         <div className="text-md">
-          <FaCircleUser />
+          {trumpOwner==no?<FaCrown />:<FaCircleUser />}
         </div>
         <div className="text-sm  text-center font-bold ">{name}</div>
       </div>

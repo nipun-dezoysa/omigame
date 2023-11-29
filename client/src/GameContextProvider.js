@@ -4,6 +4,7 @@ import io from "socket.io-client";
 const socket = io.connect("http://192.168.215.45:3001");
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
+  const [usercount, setUsercount] = useState(0);
   const [roomid, setRoomid] = useState(null);
   const [gameStatus, setGameStatus] = useState({ status: "outside" });
 
@@ -56,6 +57,9 @@ const resetvalues = ()=>{
   };
 
   useEffect(() => {
+    socket.on("usercount", (data) => {
+      setUsercount(data);
+    });
     socket.on("room", (data) => {
       setRoomid(data);
     });
@@ -155,6 +159,7 @@ const resetvalues = ()=>{
         mycardRef,
         setcardRef,
         resetvalues,
+        usercount,
       }}
     >
       {children}
