@@ -45,7 +45,14 @@ const cards = [
 var usercount = 0;
 app.use(cors());
 const server = http.createServer(app);
-const io = new socket.Server(server, { cors: { origin: '*' } });
+const io = new Server(server, {
+  cors: {
+    origin: [
+      "https://omigame.netlify.app/",
+    ],
+    methods: ["GET", "POST"],
+  },
+});
 
 io.on("connection", (socket) => {
   console.log("user: " + socket.id);
