@@ -1,10 +1,11 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { TiThMenu } from "react-icons/ti";
 export default function Layout() {
   return (
-    <div className="flex flex-col min-h-[100vh]">
+    <div className="flex flex-col min-h-screen">
       <div className="bg-white shadow-sm">
-        <div class="sticky w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+        <div class="sticky w-full mx-auto max-w-screen-xl p-4 flex items-center justify-between">
           <Link to="/">
             <h1 className="text-xl font-semibold text-black">
               OMI
@@ -13,6 +14,7 @@ export default function Layout() {
               </span>
             </h1>
           </Link>
+          <TiThMenu />
         </div>
       </div>
       <Outlet />

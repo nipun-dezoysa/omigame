@@ -5,6 +5,7 @@ import { GameContext } from "../GameContextProvider";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Bs1Circle } from "react-icons/bs";
 export default function Main() {
   const navigate = useNavigate();
   const { socket, name, setName, id, setId, resetvalues, usercount } =
