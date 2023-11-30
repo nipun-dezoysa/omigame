@@ -47,7 +47,11 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://192.168.215.45:3000", "http://localhost:3000"],
+    origin: [
+      "https://omigame.netlify.app/",
+      "http://192.168.215.45:3000",
+      "http://localhost:3000",
+    ],
     methods: ["GET", "POST"],
   },
 });
@@ -119,8 +123,8 @@ io.on("connection", (socket) => {
             }
           }
         );
-      }else{
-        socket.emit("logged", { status: false, type:1 });
+      } else {
+        socket.emit("logged", { status: false, type: 1 });
       }
     });
   });
@@ -296,7 +300,7 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnecting", () => {
     usercount--;
-    io.emit("usercount",usercount);
+    io.emit("usercount", usercount);
     userReset(socket);
     console.log(socket.id); // the Set contains at least the socket ID
   });

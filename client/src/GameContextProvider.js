@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { BiLogIn } from "react-icons/bi";
 import io from "socket.io-client";
-const socket = io.connect("http://192.168.215.45:3001");
+const socket = io.connect("https://omigame.onrender.com");
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
   const [usercount, setUsercount] = useState(0);
