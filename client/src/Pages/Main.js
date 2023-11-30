@@ -60,7 +60,7 @@ export default function Main() {
     });
   }, [socket]);
   return (
-    <div className="flex flex-col items-center py-32 gap-6 bg-center bg-no-repeat bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/conference.jpg')] bg-gray-700 bg-blend-multiply relative">
+    <div className="flex flex-col items-center py-32 gap-6 bg-center bg-no-repeat bg-[url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibkDUHuWMsArPG9uZJYRDHVvRUMk6gmtG-4jdcRQuqUTpxqUyKgancpjzNvbDSYzpLpWRZ1ZpsO4ETNAzsPWg7i-QxIguTI7jTx3gBq4lpc-D-C_EEdA10syJ3vla0fHUzZ5vwMNhWp6G9R8f2FlYqSCB3hbRCsmyEWrlL3E8oTvkP_n3yRD6CkV-LQvA/s1920/cover.jpg')] bg-gray-700 bg-blend-multiply relative">
       <div>
         <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
           <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>

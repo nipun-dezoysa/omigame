@@ -1,13 +1,13 @@
 import Preimg from "./Preimg";
 import { IoMdCloseCircleOutline } from "react-icons/io";
-export default function Previoussub({ sub ,setPre}) {
+export default function Previoussub({ sub ,setPre,title}) {
   return (
     <div className="fixed z-50 top-0 left-0 h-[100vh] w-full flex justify-center items-center">
       <div className="bg-white relative rounded-lg p-3 shadow-lg">
         <div className="absolute right-1 top-1 text-2xl cursor-pointer" onClick={()=>setPre(false)}>
           <IoMdCloseCircleOutline />
         </div>
-        <h1>Previous Round</h1>
+        <h1 className="text-center">{title}</h1>
         <div className="flex flex-col gap-1">
           <div className="flex gap-2">
             <Preimg src={sub[0]} />

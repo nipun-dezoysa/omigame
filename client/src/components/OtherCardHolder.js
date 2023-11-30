@@ -7,7 +7,7 @@ export default function OtherCardHolder({ no, styles, cards, place,trumpOwner })
   var full = "half_back.webp";
   var side = "half_back_side.webp";
   if (place == 2) {
-    full = "left_half_back.png";
+    full = "left_half_back.png";   
     side = "left_half_back_side.png";
   } else if (place == 3) {
     full = "right_half_back.png";

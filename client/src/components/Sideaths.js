@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Previoussub from "./Previoussub";
-export default function Sideaths({ count, sub }) {
+export default function Sideaths({ count, sub,title }) {
   const [side, setSide] = useState([]);
   const[pre,setPre] = useState(false);
   useEffect(() => {
@@ -10,11 +10,11 @@ export default function Sideaths({ count, sub }) {
   }, [count]);
   return (
     <div className="flex">
-      {pre&&<Previoussub sub={sub} setPre={setPre}/>}
+      {pre&&<Previoussub sub={sub} setPre={setPre} title={title}/>}
       {side.map((card, index) => {
         return (
           <img
-            className="h-[120px]"
+            className="h-[120px] cursor-pointer"
             onClick={() => setPre(true)}
             src={
               index == side.length - 1

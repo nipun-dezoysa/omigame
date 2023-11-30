@@ -80,6 +80,7 @@ const resetvalues = ()=>{
       //round start weddi okkoma var tika reset karanna oni
     });
     socket.on("slot_pull", ({ status, slot, name }) => {
+      if(status!=1)setGameStatus("outside");
       switch (slot) {
         case 1:
           status == 1 ? setSlot1({ name, player: "other" }) : setSlot1(null);
