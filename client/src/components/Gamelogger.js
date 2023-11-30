@@ -108,7 +108,7 @@ export default function Gamelogger() {
                     <IoMdLink
                       className="text-gray-400 cursor-pointer"
                       onClick={() => {
-                        copy("http://localhost:3000/game/" + rid);
+                        copy("https://omigame.netlify.app/game/" + rid);
                         toast.info("Copied", {
                           position: "top-center",
                           autoClose: 5000,
