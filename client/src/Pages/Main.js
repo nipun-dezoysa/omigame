@@ -5,6 +5,8 @@ import { GameContext } from "../GameContextProvider";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Bs1Circle, Bs2Circle, Bs3Circle } from "react-icons/bs";
+import { Link } from "react-router-dom";
 export default function Main() {
   const navigate = useNavigate();
   const { socket, name, setName, id, setId, resetvalues, usercount } =
@@ -12,7 +14,7 @@ export default function Main() {
   const [iscreate, setIscreate] = useState(false);
   const [btnwait, setbtnwait] = useState(false);
   const [btnwait1, setbtnwait1] = useState(false);
-  
+
   function logRoom() {
     resetvalues();
     if (iscreate) {
@@ -27,7 +29,6 @@ export default function Main() {
     socket.emit("userrest", "reset");
   }, []);
   useEffect(() => {
-    
     socket.on("logged", (data) => {
       if (data.status) {
         navigate("/game/" + data.roomid);
@@ -128,33 +129,18 @@ export default function Main() {
           </div>
         </div>
       </div>
-      <div className="mt-[180px] flex flex-col items-center mb-1 gap-1">
-        <ol class="flex items-center text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base lg:w-[550px]">
-          <li class="flex md:w-full items-center text-blue-600 dark:text-blue-500 sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
-            <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-              <svg
-                class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-              </svg>
-              Create/Join <span class="hidden sm:inline-flex sm:ms-2">Room</span>
-            </span>
-          </li>
-          <li class="flex md:w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700">
-            <span class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
-              <span class="me-2">2</span>
-              Account <span class="hidden sm:inline-flex sm:ms-2">Info</span>
-            </span>
-          </li>
-          <li class="flex items-center">
-            <span class="me-2">3</span>
-            Confirmation
-          </li>
-        </ol>
+      <div className="mt-[180px] flex justify-center flex-col lg:flex-row max-lg:items-center mb-1 gap-1">
+        <div className="p-5 rounded-lg flex flex-row lg:flex-col justify-evenly bg-gradient-to-br lg:bg-gradient-to-b from-slate-400 to-slate-900 w-[90%] lg:w-44 text-slate-200 max-md:text-sm">
+          <div className="flex items-center gap-1">
+            <Bs1Circle /> <div>Create or Join</div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Bs2Circle /> <div>Share Link</div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Bs3Circle /> <div>Play Game</div>
+          </div>
+        </div>
         <div className="p-5 max-w-[500px] w-[90%] bg-center bg-no-repeat bg-[url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibkDUHuWMsArPG9uZJYRDHVvRUMk6gmtG-4jdcRQuqUTpxqUyKgancpjzNvbDSYzpLpWRZ1ZpsO4ETNAzsPWg7i-QxIguTI7jTx3gBq4lpc-D-C_EEdA10syJ3vla0fHUzZ5vwMNhWp6G9R8f2FlYqSCB3hbRCsmyEWrlL3E8oTvkP_n3yRD6CkV-LQvA/s1920/cover.jpg')] bg-gray-700 bg-blend-multiply rounded-lg">
           <h1 className="text-white font-bold text-xl">OMI GAME</h1>
           <p className="text-white font-mono text-sm">
@@ -162,9 +148,9 @@ export default function Main() {
             Omi! Designed for four players, the objective is simple yet
             engaging—be the first team to score above 10 points to claim...
           </p>
-          <div className="text-slate-400 mt-1 shadow-lg bg-slate-900 w-24 flex justify-center p-1 rounded-lg">
+          <Link to="/about" className="text-slate-400 hover:text-slate-300 mt-1 shadow-lg bg-slate-900 hover:bg-slate-800 w-24 flex justify-center p-1 rounded-lg">
             Read More
-          </div>
+          </Link>
         </div>
       </div>
     </>
