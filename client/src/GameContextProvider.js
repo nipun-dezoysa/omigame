@@ -5,7 +5,7 @@ const socket = io("https://omigame.onrender.com", {});
 
 export const GameContext = createContext({});
 export function GameContextProvider({ children }) {
-  const [usercount, setUsercount] = useState(0);
+  const [usercount, setUsercount] = useState(1);
   const [roomid, setRoomid] = useState(null);
   const [gameStatus, setGameStatus] = useState({ status: "outside" });
 
