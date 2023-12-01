@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { FaCircleUser } from "react-icons/fa6";
 import { FaCrown } from "react-icons/fa";
 export default function OtherCardHolder({ no, styles, cards, place,trumpOwner }) {
-  var full = "half_back.webp";
-  var side = "half_back_side.webp";
+  var full = "half_back.png";
+  var side = "half_back_side.png";
   if (place == 2) {
     full = "left_half_back.png";   
     side = "left_half_back_side.png";
