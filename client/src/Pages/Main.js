@@ -144,7 +144,7 @@ export default function Main() {
         <div className="p-5 max-w-[500px] w-[90%] bg-center bg-no-repeat bg-[url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEibkDUHuWMsArPG9uZJYRDHVvRUMk6gmtG-4jdcRQuqUTpxqUyKgancpjzNvbDSYzpLpWRZ1ZpsO4ETNAzsPWg7i-QxIguTI7jTx3gBq4lpc-D-C_EEdA10syJ3vla0fHUzZ5vwMNhWp6G9R8f2FlYqSCB3hbRCsmyEWrlL3E8oTvkP_n3yRD6CkV-LQvA/s1920/cover.jpg')] bg-gray-700 bg-blend-multiply rounded-lg">
           <h1 className="text-white font-bold text-xl">OMI GAME</h1>
           <p className="text-white font-mono text-sm">
-            Welcome to OMIGAME inspired by the classic Sri Lankan card game,
+            Welcome to the OMIGAME inspired by the classic Sri Lankan card game,
             Omi! Designed for four players, the objective is simple yet
             engaging—be the first team to score above 10 points to claim...
           </p>
