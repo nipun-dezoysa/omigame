@@ -527,7 +527,7 @@ function gameEnd(roomid, roundid, subroundid, winner, slot) {
                           }
                           db.run(sql, [marks, rows.gameid]);
                           //10
-                          if (marks >= 2) {
+                          if (marks >= 10) {
                             //win full game
                             console.log("won the full game");
                             io.to(roomid).emit("result", {
