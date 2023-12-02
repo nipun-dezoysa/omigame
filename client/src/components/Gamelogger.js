@@ -35,6 +35,7 @@ export default function Gamelogger() {
   } = useContext(GameContext);
   const [btnwait, setbtnwait] = useState(false);
   const [roomVerify, SetroomVerify] = useState(false);
+  const[roomWaiting,setRoomWaiting]=useState(true);
   const { rid } = useParams();
   const join = () => {
     resetvalues();
@@ -52,6 +53,7 @@ export default function Gamelogger() {
   useEffect(() => {
     socket.on("roomdet", (data) => {
       SetroomVerify(data.status);
+      if(!data.status)setRoomWaiting(false);
     });
     socket.on("logged", (data) => {
       if (data.status) {
@@ -89,7 +91,7 @@ export default function Gamelogger() {
       <ToastContainer />
       {gameStatus.status == "outside" && (
         <div className="mt-20 flex flex-col w-[90%] md:w-96 rounded-lg bg-white mx-auto shadow-md overflow-hidden">
-          {!roomVerify && (
+          {(!roomVerify && !roomWaiting) && (
             <div className="px-4 py-5 flex items-center gap-2">
               <MdErrorOutline />
               There is no room

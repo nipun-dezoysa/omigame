@@ -29,9 +29,9 @@ export default function Layout() {
           </span>
           <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-400 sm:mt-0">
             <li>
-              <a href="#" class="hover:underline me-4 md:me-6">
+              <Link to="/about" class="hover:underline me-4 md:me-6">
                 About
-              </a>
+              </Link>
             </li>
             <li>
               <a href="#" class="hover:underline me-4 md:me-6">
