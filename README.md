@@ -1,5 +1,6 @@
 # omigame
  A multiplayer online card game has been crafted using React and Nodejs. The game accommodates four players simultaneously and incorporates various libraries and frameworks to enhance the gaming experience.
+[demo-site](https://omigame.netlify.app/)
 
 ## Prerequisites
 + Git: https://git-scm.com
